@@ -6,17 +6,9 @@ pub fn health_routes(
     // Create the Health Check route
     warp::path!("health")
         .and(with_db(client))
-        .and_then(health_handler)
+        .and_then(handler::health)
         .with(warp::trace(|info| {
             // Construct our own custom span for this route.
             tracing::info_span!("Health Check", req.path = ?info.path())
         }))
-}
-
-pub async fn health_handler(client: db::Client) -> Result<impl Reply, Rejection> {
-    tracing::info!("Pinging Database");
-    db::ping(&client)
-        .await
-        .map_err(|e| error::ServerError::DataBaseError { source: e })?;
-    Ok(StatusCode::OK)
 }

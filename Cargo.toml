@@ -1,5 +1,5 @@
 [package]
-name = "zero_to_prod"
+name = "warp_crud"
 version = "0.1.0"
 authors = ["RyanFrazier <rfrazier716@gmail.com>"]
 edition = "2018"
@@ -9,7 +9,7 @@ path = "src/lib.rs"
 
 [[bin]]
 path = "src/main.rs"
-name = "zero2prod"
+name = "warp_crud"
 
 [dependencies]
 # The Framework we'll be using
@@ -17,6 +17,7 @@ warp="0.3.0"
 reqwest = "0.11.3"
 tokio = {version="1.6.0", features=["full"]}
 mongodb = "2.0.0-beta"
+futures = "0.3.15"
 
 # Tracing
 tracing = "0.1.26"

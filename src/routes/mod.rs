@@ -1,15 +1,16 @@
-use crate::db;
-use crate::error;
+use crate::{db, error, handler};
 use std::convert::Infallible;
 use warp::http::StatusCode;
 use warp::{Filter, Rejection, Reply};
 
-pub mod health;
+mod health;
+mod people;
 
 pub fn routes(
     client: db::Client,
 ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    health::health_routes(client)
+    health::health_routes(client.clone())
+        .or(people::people_routes(client.clone()))
 }
 
 pub fn with_db(

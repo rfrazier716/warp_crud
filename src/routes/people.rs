@@ -10,7 +10,11 @@ pub fn people_routes(
     people
         .and(warp::get())
         .and(with_db(client.clone()))
-        .and(warp::path::param::<String>())
+        .and(
+            warp::path::param::<String>()
+                .or(warp::any().map(|| String::default()))
+                .unify(),
+        )
         .and_then(get_people)
 }
 
@@ -26,11 +30,13 @@ pub async fn get_people<T>(client: db::Client, name_str: T) -> Result<impl Reply
 where
     T: AsRef<str>,
 {
+    let name_str = name_str.as_ref();
+    print!("{:?}", name_str);
     // build the request filter
-    let request_filter = if name_str.as_ref().is_empty() {
+    let request_filter = if name_str.is_empty() {
         None
     } else {
-        Some(doc! {"fname": name_str.as_ref()})
+        Some(doc! {"fname": name_str})
     };
 
     let reply = db::get_people(&client, request_filter)

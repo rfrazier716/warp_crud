@@ -13,20 +13,20 @@ pub async fn ping(client: &Client) -> Result<Document> {
         .await
 }
 
-pub async fn get_people(client: &Client) -> Result<Vec<data::Person>> {
+pub async fn get_people(
+    client: &Client,
+    filter: impl Into<Option<Document>>,
+) -> Result<Vec<data::Person>> {
     let cursor = client
         .database("warp_rest")
         .collection::<data::Person>("people")
-        .find(None, None)
+        .find(filter, None)
         .await?;
 
     cursor.try_collect().await
 }
 
-pub async fn get_person(
-    client: &Client,
-    first_name: &str,
-) -> Result<Option<data::Person>> {
+pub async fn get_person(client: &Client, first_name: &str) -> Result<Option<data::Person>> {
     client
         .database("warp_rest")
         .collection::<data::Person>("people")

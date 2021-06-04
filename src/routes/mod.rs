@@ -9,8 +9,7 @@ mod people;
 pub fn routes(
     client: db::Client,
 ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    health::health_routes(client.clone())
-        .or(people::people_routes(client.clone()))
+    health::health_routes(client.clone()).or(people::people_routes(client.clone()))
 }
 
 pub fn with_db(

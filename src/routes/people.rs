@@ -1,5 +1,5 @@
 use warp::filters::{body, path};
-use warp::{Filter};
+use warp::Filter;
 
 use super::with_db;
 use crate::{data, db, handler::people};
@@ -7,18 +7,17 @@ use crate::{data, db, handler::people};
 pub fn people_routes(
     client: db::Client,
 ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    let people = warp::path("api")
-        .and(warp::path("people"));
+    let people = warp::path("api").and(warp::path("people"));
 
     // Create Routes
     people
         .and(with_db(client.clone()))
-        .and(create_route()).and_then(people::create)
-        .or(
-            people
-                .and(with_db(client.clone()))
-                .and(read_route()).and_then(people::read)
-        )
+        .and(create_route())
+        .and_then(people::create)
+        .or(people
+            .and(with_db(client.clone()))
+            .and(read_route())
+            .and_then(people::read))
 }
 
 fn read_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Copy {

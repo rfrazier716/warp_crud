@@ -1,6 +1,6 @@
 use crate::{db, handler};
 use std::convert::Infallible;
-use warp::{Filter};
+use warp::Filter;
 
 mod health;
 mod people;

@@ -1,9 +1,8 @@
-
 use warp::http::StatusCode;
 use warp::{Rejection, Reply};
 
-use crate::{db, data};
 use crate::error::ServerError::DataBaseError;
+use crate::{data, db};
 
 pub async fn health(client: db::Client) -> Result<impl Reply, Rejection> {
     tracing::info!("Pinging Database");
@@ -17,7 +16,10 @@ pub mod people {
     use super::*;
     use mongodb::bson::doc;
 
-    pub async fn create(client: db::Client, person: data::PersonRequest) -> Result<impl Reply, Rejection>{
+    pub async fn create(
+        client: db::Client,
+        person: data::PersonRequest,
+    ) -> Result<impl Reply, Rejection> {
         //TODO!: Finish this Function
         Ok(StatusCode::OK)
     }

@@ -31,7 +31,9 @@ fn read_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + C
 }
 
 fn create_route() -> impl Filter<Extract = (data::PersonRequest,), Error = warp::Rejection> + Copy {
-    body::content_length_limit(4096).and(body::json())
+    warp::post()
+        .and(body::content_length_limit(4096))
+        .and(body::json())
 }
 
 #[cfg(test)]
@@ -58,6 +60,34 @@ mod test {
                 .await
                 .unwrap();
             assert_eq!(reply, new_person);
+        }
+
+        #[tokio::test]
+        async fn test_create_with_wrong_request() {
+            let new_person = PersonRequest {
+                fname: "Chicken".to_string(),
+                lname: "Little".to_string(),
+            };
+            let filter = create_route();
+            let reply = test::request()
+                .path("/")
+                .method("GET")
+                .json(&new_person)
+                .filter(&filter)
+                .await;
+            assert!(reply.is_err());
+        }
+
+        #[tokio::test]
+        async fn test_create_incorrect_person() {
+            let filter = create_route();
+            let reply = test::request()
+                .path("/")
+                .method("POST")
+                .body("Hello World")
+                .filter(&filter)
+                .await;
+            assert!(reply.is_err())
         }
     }
 

@@ -1,7 +1,9 @@
 use crate::data;
+
+use chrono::prelude::*;
 use futures::stream::TryStreamExt;
-use mongodb::bson::{doc, Document};
-use mongodb::error::Result;
+use mongodb::bson::{doc, oid::ObjectId, Bson, Document};
+use mongodb::error::{Error, ErrorKind, Result};
 
 pub(crate) type Client = mongodb::Client;
 
@@ -33,4 +35,13 @@ pub async fn get_person(client: &Client, first_name: &str) -> Result<Option<data
         .await?
         .try_next()
         .await
+}
+
+pub async fn create_person(client: &Client, person: data::PersonRequest) -> Result<Bson> {
+    let reply = client
+        .database("warp_rest")
+        .collection::<Document>("people")
+        .insert_one(doc! {"fname": person.fname, "lname": person.lname}, None)
+        .await?;
+    Ok(reply.inserted_id)
 }

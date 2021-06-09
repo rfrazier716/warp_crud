@@ -1,6 +1,5 @@
 use crate::data;
-use futures::stream::{StreamExt, TryStreamExt};
-use mongodb::bson;
+use futures::stream::{TryStreamExt};
 use mongodb::bson::{doc, Document};
 use mongodb::error::Result;
 

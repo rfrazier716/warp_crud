@@ -1,4 +1,3 @@
-use chrono::prelude::*;
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +9,7 @@ pub struct Person {
     pub timestamp: mongodb::bson::DateTime,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug, PartialEq)]
 pub struct PersonRequest {
     pub fname: String,
     pub lname: String,

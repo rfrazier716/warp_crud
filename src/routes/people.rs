@@ -1,4 +1,4 @@
-use warp::filters::{body, path, BoxedFilter};
+use warp::filters::{body, path};
 use warp::Filter;
 
 use super::with_db;
@@ -33,6 +33,7 @@ fn read_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + C
         .and(path::end())
 }
 
+#[allow(dead_code)] //TODO!: Remove this after implementing handler
 fn update_route(
 ) -> impl Filter<Extract = (String, data::PersonRequest), Error = warp::Rejection> + Copy {
     warp::put()
@@ -41,6 +42,7 @@ fn update_route(
         .and(path::end())
 }
 
+#[allow(dead_code)] //TODO!: Remove this after implementing handler
 fn delete_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Copy {
     warp::delete()
         .and(warp::path::param::<String>())

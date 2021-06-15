@@ -1,5 +1,5 @@
 use warp::http::StatusCode;
-use warp::{http::Response, Rejection, Reply};
+use warp::{Rejection, Reply};
 
 use crate::error::ServerError::DataBaseError;
 use crate::{data, db};

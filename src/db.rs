@@ -2,8 +2,8 @@ use crate::data;
 
 use chrono::Utc;
 use futures::stream::TryStreamExt;
-use mongodb::bson::{doc, oid::ObjectId, Bson, Document};
-use mongodb::error::{Error, ErrorKind, Result};
+use mongodb::bson::{doc, Bson, Document};
+use mongodb::error::Result;
 
 pub(crate) type Client = mongodb::Client;
 

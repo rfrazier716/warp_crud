@@ -7,20 +7,20 @@ use crate::{data, db, handler::people};
 pub fn people_routes(
     client: db::Client,
 ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    let people = warp::path("api").and(warp::path("people")).and(with_db(client));
+    let people = warp::path("api")
+        .and(warp::path("people"))
+        .and(with_db(client));
 
     // Create Routes
-    people.clone()
+    people
+        .clone()
         .and(create_route())
         .and_then(people::create)
-        .or(people.clone()
-            .and(read_route())
-            .and_then(people::read))
+        .or(people.clone().and(read_route()).and_then(people::read))
 }
 
 fn create_route() -> impl Filter<Extract = (data::PersonRequest,), Error = warp::Rejection> + Copy {
-    warp::post()
-        .and(person_request())
+    warp::post().and(person_request())
 }
 
 fn read_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Copy {
@@ -33,7 +33,8 @@ fn read_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + C
         .and(path::end())
 }
 
-fn update_route() -> impl Filter<Extract = (String, data::PersonRequest,), Error = warp::Rejection> + Copy {
+fn update_route(
+) -> impl Filter<Extract = (String, data::PersonRequest), Error = warp::Rejection> + Copy {
     warp::put()
         .and(warp::path::param::<String>())
         .and(person_request())
@@ -46,13 +47,10 @@ fn delete_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> +
         .and(path::end())
 }
 
-
-
-fn person_request() -> impl Filter<Extract = (data::PersonRequest,), Error = warp::Rejection> + Copy {
-    body::content_length_limit(4096)
-        .and(body::json())
+fn person_request() -> impl Filter<Extract = (data::PersonRequest,), Error = warp::Rejection> + Copy
+{
+    body::content_length_limit(4096).and(body::json())
 }
-
 
 #[cfg(test)]
 mod test {

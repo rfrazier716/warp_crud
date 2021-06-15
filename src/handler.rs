@@ -1,5 +1,5 @@
 use warp::http::StatusCode;
-use warp::{Rejection, Reply};
+use warp::{http::Response, Rejection, Reply};
 
 use crate::error::ServerError::DataBaseError;
 use crate::{data, db};
@@ -20,8 +20,10 @@ pub mod people {
         client: db::Client,
         person: data::PersonRequest,
     ) -> Result<impl Reply, Rejection> {
-        //TODO!: Finish this Function
-        Ok(StatusCode::OK)
+        let reply = db::create_person(&client, person)
+            .await
+            .map_err(|source| DataBaseError { source })?;
+        Ok(warp::reply::json(&reply))
     }
 
     pub async fn read<T>(client: db::Client, name_str: T) -> Result<impl Reply, Rejection>

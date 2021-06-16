@@ -5,6 +5,8 @@ use futures::stream::TryStreamExt;
 use mongodb::bson::{doc, Bson, Document};
 use mongodb::error::Result;
 
+const DB_NAME: &str = "warp_crud";
+
 pub(crate) type Client = mongodb::Client;
 
 pub async fn ping(client: &Client) -> Result<Document> {
@@ -19,7 +21,7 @@ pub async fn get_people(
     filter: impl Into<Option<Document>>,
 ) -> Result<Vec<data::Person>> {
     let cursor = client
-        .database("warp_rest")
+        .database(DB_NAME)
         .collection::<data::Person>("people")
         .find(filter, None)
         .await?;
@@ -29,7 +31,7 @@ pub async fn get_people(
 
 pub async fn get_person(client: &Client, first_name: &str) -> Result<Option<data::Person>> {
     client
-        .database("warp_rest")
+        .database(DB_NAME)
         .collection::<data::Person>("people")
         .find(doc! { "fname": first_name}, None)
         .await?
@@ -43,7 +45,7 @@ pub async fn create_person(client: &Client, person: data::PersonRequest) -> Resu
     //add a timestamp for the update value
     doc.insert("timestamp", Utc::now());
     let reply = client
-        .database("warp_rest")
+        .database(DB_NAME)
         .collection::<Document>("people")
         .insert_one(doc, None)
         .await?;

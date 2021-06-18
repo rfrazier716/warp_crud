@@ -58,34 +58,28 @@ async fn test_people_read() {
     assert!(!people.is_empty()); // make sure the reply isn't empty
 
     //now test that we can readback a single person
-    let person_id= &people[0].id;
+    let person_id = &people[0].id;
 
     // make a new endpoint
-    let person_endpoint = format!("{}/{}",
-        &base_endpoint,
-        person_id
-    );
+    let person_endpoint = format!("{}/{}", &base_endpoint, person_id);
     let resp = client.get(&person_endpoint).send().await.unwrap();
     assert!(resp.status().is_success());
 
-    let person = resp.json::<Person>()
+    let person = resp
+        .json::<Person>()
         .await
-        .map_err(|x| format!("Could not convert reply into Person {}",x))
+        .map_err(|x| format!("Could not convert reply into Person {}", x))
         .unwrap();
     assert_eq!(person, people[0]); // make sure we got the same person back that the ID matches
 
     // Make a request with an invalid endpoint (too short to be an object ID)
     // the error filter should make this a 404
-    let malformed_id_endpoint = format!("{}/{}",
-    &base_endpoint,
-    "deadbeef");
+    let malformed_id_endpoint = format!("{}/{}", &base_endpoint, "deadbeef");
     let resp = client.get(&malformed_id_endpoint).send().await.unwrap();
     assert_eq!(resp.status().as_u16(), 404); // verify we get a 404 error
 
     // now make a couple dummy requests - this is the right id layout but nonexistant
-    let nonexistent_id_endpoint = format!("{}/{}",
-                                        &base_endpoint,
-                                        "deadbeefdeadbeefdeadbeef");
+    let nonexistent_id_endpoint = format!("{}/{}", &base_endpoint, "deadbeefdeadbeefdeadbeef");
 
     let resp = client.get(&nonexistent_id_endpoint).send().await.unwrap();
     assert_eq!(resp.status().as_u16(), 404); // verify we get a 404 error

@@ -2,7 +2,7 @@ use crate::{data, error::Error::*, Result};
 
 use chrono::prelude::*;
 use futures::stream::{StreamExt, TryStreamExt};
-use mongodb::bson::{doc, oid::ObjectId, Bson, Document};
+use mongodb::bson::{doc, oid::ObjectId, Document};
 
 const DB_NAME: &str = "warp_crud"; // database name
 const PEOPLE: &str = "people"; // the people collection

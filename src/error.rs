@@ -1,5 +1,5 @@
-use warp::reject::Reject;
 use mongodb::bson;
+use warp::reject::Reject;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -19,7 +19,7 @@ pub enum Error {
     MongoQueryError(mongodb::error::Error),
 
     #[error("Database insertion did not return a new ObjectID")]
-    MongoCreateError
+    MongoCreateError,
 }
 
 impl Reject for Error {}

@@ -1,48 +1,54 @@
 use warp::http::StatusCode;
 use warp::{Rejection, Reply};
-use mongodb::bson;
 
-use crate::error::Error::DataBaseError;
+use crate::error::Error::*;
 use crate::{data, db};
 
 pub async fn health(client: db::Client) -> Result<impl Reply, Rejection> {
     tracing::info!("Pinging Database");
     db::ping(&client)
-        .await
-        .map_err(|e| DataBaseError { source: e })?;
+        .await?;
     Ok(StatusCode::OK)
 }
 
 pub mod people {
     use super::*;
-    use mongodb::bson::doc;
-    use std::str::FromStr;
 
     pub async fn create(
         client: db::Client,
         person: data::PersonRequest,
     ) -> Result<impl Reply, Rejection> {
         let reply = db::create_person(&client, person)
-            .await
-            .map_err(|source| DataBaseError { source })?;
+            .await?;
         Ok(warp::reply::json(&reply))
     }
 
-    pub async fn read_all(client: db::Client) -> Result <impl Reply, Rejection> {
+    pub async fn read_all(client: db::Client) -> Result<impl Reply, Rejection> {
         let reply = db::get_people(&client)
-            .await
-            .map_err(|source| DataBaseError {source})?;
+            .await?;
         Ok(warp::reply::json(&reply))
     }
 
-    // pub async fn read_single<T>(client: db::Client, user_id: T) -> Result<impl Reply, Rejection>
-    // where T: AsRef<str>
-    // {
-    //     //TODO!: Finish this function to accept an Object ID
-    //     let user_id = bson::oid::ObjectId::from_str(user_id.as_ref()).map_err(|source| DataBaseError {source})?;
-    //     let reply = db::get_person(&client, user_id)
-    //         .await
-    //         .map_err(|source| DataBaseError { source })?;
-    //     Ok(warp::reply::json(&reply))
-    // }
+    pub async fn read_single<T>(client: db::Client, user_id: T) -> Result<Box<dyn Reply>, Rejection>
+    where T: AsRef<str>
+    {
+        let reply = db::get_person(&client, user_id.as_ref())
+            .await;
+
+        // if it's an OID conversion error we want that to show up as a generic 404
+        let result = match reply {
+            Err(MongoOidError(_)) => None,
+            other => other?
+        };
+
+        // Implement the result, with a success or 404 error
+        if let Some(person) = result{
+            Ok(Box::new(warp::reply::json(&person)))
+        } else { Ok(
+            Box::new(
+                warp::http::Response::builder()
+                .status(404)
+                .body("404: Person not found")
+                    ))} // if there wasn't a person with that ID return a 404 error
+    }
 }

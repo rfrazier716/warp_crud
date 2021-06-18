@@ -16,8 +16,14 @@ pub fn people_routes(
         .clone()
         .and(create_route())
         .and_then(handler::people::create)
-        .or(people.clone().and(read_all_route()).and_then(handler::people::read_all))
-        //.or(people.clone().and(read_single_route().and_then(handler::people::read_single)))
+        .or(people
+            .clone()
+            .and(read_all_route())
+            .and_then(handler::people::read_all))
+        .or(people
+            .clone()
+            .and(read_single_route())
+            .and_then(handler::people::read_single))
 }
 
 fn create_route() -> impl Filter<Extract = (data::PersonRequest,), Error = warp::Rejection> + Copy {
@@ -25,8 +31,7 @@ fn create_route() -> impl Filter<Extract = (data::PersonRequest,), Error = warp:
 }
 
 fn read_all_route() -> impl Filter<Extract = (), Error = warp::Rejection> + Copy {
-    warp::get()
-        .and(path::end())
+    warp::get().and(path::end())
 }
 
 fn read_single_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Copy {

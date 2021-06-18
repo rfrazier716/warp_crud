@@ -1,7 +1,8 @@
 use warp::http::StatusCode;
 use warp::{Rejection, Reply};
+use mongodb::bson;
 
-use crate::error::ServerError::DataBaseError;
+use crate::error::Error::DataBaseError;
 use crate::{data, db};
 
 pub async fn health(client: db::Client) -> Result<impl Reply, Rejection> {
@@ -15,6 +16,7 @@ pub async fn health(client: db::Client) -> Result<impl Reply, Rejection> {
 pub mod people {
     use super::*;
     use mongodb::bson::doc;
+    use std::str::FromStr;
 
     pub async fn create(
         client: db::Client,
@@ -26,22 +28,21 @@ pub mod people {
         Ok(warp::reply::json(&reply))
     }
 
-    pub async fn read<T>(client: db::Client, name_str: T) -> Result<impl Reply, Rejection>
-    where
-        T: AsRef<str>,
-    {
-        let name_str = name_str.as_ref();
-        print!("{:?}", name_str);
-        // build the request filter
-        let request_filter = if name_str.is_empty() {
-            None
-        } else {
-            Some(doc! {"fname": name_str})
-        };
-
-        let reply = db::get_people(&client, request_filter)
+    pub async fn read_all(client: db::Client) -> Result <impl Reply, Rejection> {
+        let reply = db::get_people(&client)
             .await
-            .map_err(|source| DataBaseError { source })?;
+            .map_err(|source| DataBaseError {source})?;
         Ok(warp::reply::json(&reply))
     }
+
+    // pub async fn read_single<T>(client: db::Client, user_id: T) -> Result<impl Reply, Rejection>
+    // where T: AsRef<str>
+    // {
+    //     //TODO!: Finish this function to accept an Object ID
+    //     let user_id = bson::oid::ObjectId::from_str(user_id.as_ref()).map_err(|source| DataBaseError {source})?;
+    //     let reply = db::get_person(&client, user_id)
+    //         .await
+    //         .map_err(|source| DataBaseError { source })?;
+    //     Ok(warp::reply::json(&reply))
+    // }
 }

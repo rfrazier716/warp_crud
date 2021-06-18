@@ -2,7 +2,7 @@ use warp::filters::{body, path};
 use warp::Filter;
 
 use super::with_db;
-use crate::{data, db, handler::people};
+use crate::{data, db, handler};
 
 pub fn people_routes(
     client: db::Client,
@@ -15,21 +15,23 @@ pub fn people_routes(
     people
         .clone()
         .and(create_route())
-        .and_then(people::create)
-        .or(people.clone().and(read_route()).and_then(people::read))
+        .and_then(handler::people::create)
+        .or(people.clone().and(read_all_route()).and_then(handler::people::read_all))
+        //.or(people.clone().and(read_single_route().and_then(handler::people::read_single)))
 }
 
 fn create_route() -> impl Filter<Extract = (data::PersonRequest,), Error = warp::Rejection> + Copy {
     warp::post().and(person_request())
 }
 
-fn read_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Copy {
+fn read_all_route() -> impl Filter<Extract = (), Error = warp::Rejection> + Copy {
     warp::get()
-        .and(
-            path::param::<String>()
-                .or(warp::any().map(|| String::from("")))
-                .unify(),
-        )
+        .and(path::end())
+}
+
+fn read_single_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Copy {
+    warp::get()
+        .and(warp::path::param::<String>())
         .and(path::end())
 }
 
@@ -80,15 +82,14 @@ mod test {
     #[tokio::test]
     async fn test_read_empty() {
         // an empty read request should result in an empty string
-        let filter = read_route();
+        let filter = read_all_route();
         let value = test::request().path("/").filter(&filter).await.unwrap();
-        assert_eq!(value, "")
     }
 
     #[tokio::test]
     async fn test_read_with_name() {
         //a read route with only one path should return the path string
-        let filter = read_route();
+        let filter = read_single_route();
         let value = test::request()
             .path("/FirstName")
             .filter(&filter)

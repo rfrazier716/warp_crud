@@ -6,3 +6,5 @@ pub mod startup;
 
 pub mod data;
 mod handler;
+
+type Result<T> = std::result::Result<T, error::Error>;

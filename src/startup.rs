@@ -7,11 +7,11 @@ use warp::Filter;
 // Run is in its own function so it can be started as a separate task for Integration Tests
 pub async fn run(
     settings: config::Settings,
-) -> Result<(SocketAddr, impl Future<Output = ()> + 'static), error::ServerError> {
+) -> Result<(SocketAddr, impl Future<Output = ()> + 'static), error::Error> {
     // Create a Database Connection from the URI
     let client = db::Client::with_uri_str(settings.database.uri)
         .await
-        .map_err(|source| error::ServerError::DataBaseError { source })?;
+        .map_err(|source| error::Error::DataBaseError { source })?;
 
     // Add all our routes
     let routes = routes::routes(client).with(warp::trace::request());

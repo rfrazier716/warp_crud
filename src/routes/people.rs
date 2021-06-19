@@ -88,7 +88,7 @@ mod test {
     async fn test_read_empty() {
         // an empty read request should result in an empty string
         let filter = read_all_route();
-        let value = test::request().path("/").filter(&filter).await.unwrap();
+        test::request().path("/").filter(&filter).await.unwrap();
     }
 
     #[tokio::test]

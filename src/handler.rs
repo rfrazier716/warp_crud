@@ -49,4 +49,12 @@ pub mod people {
             ))
         } // if there wasn't a person with that ID return a 404 error
     }
+
+    pub async fn update<T>(client: db::Client, user_id: T, person_request: data::PersonRequest) -> Result<impl Reply, Rejection>
+    where
+        T: AsRef<str>,
+    {
+        db::update_person(&client, user_id.as_ref(), person_request).await?;
+        Ok(StatusCode::OK) //return a success if the update occured
+    }
 }

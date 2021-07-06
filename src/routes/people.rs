@@ -24,6 +24,10 @@ pub fn people_routes(
             .clone()
             .and(read_single_route())
             .and_then(handler::people::read_single))
+        .or(people
+            .clone()
+            .and(update_route())
+            .and_then(handler::people::update))
 }
 
 fn create_route() -> impl Filter<Extract = (data::PersonRequest,), Error = warp::Rejection> + Copy {

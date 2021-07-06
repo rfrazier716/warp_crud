@@ -84,6 +84,33 @@ pub async fn create_person(client: &Client, person: data::PersonRequest) -> Resu
     }
 }
 
+pub async fn update_person(
+    client: &Client,
+    obj_id: &str,
+    person: data::PersonRequest,
+) -> Result<()> {
+    // convert the object id to a mongodb id
+    let obj_id = ObjectId::parse_str(obj_id)?;
+
+    let doc = doc! { "$set": {
+        FNAME: person.fname,
+        LNAME: person.lname,
+        TIMESTAMP: Utc::now()
+        }
+    };
+
+    let filter = doc! { ID: obj_id};
+
+    client
+        .database(DB_NAME)
+        .collection::<Document>("people")
+        .update_one(filter, doc, None)
+        .await
+        .map_err(MongoQueryError)?;
+
+    Ok(())
+}
+
 fn doc_to_person(doc: &Document) -> Result<data::Person> {
     let id = doc.get_object_id(ID)?.to_hex(); //Fields will always need an ID
     let fname = doc.get_str(FNAME)?.to_owned();

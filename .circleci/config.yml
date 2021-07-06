@@ -86,9 +86,17 @@ jobs:
       - restore_cache:
           keys:
             - cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
-
       - run:
-          name: Built all targets
+          name: Install Mongo Shell
+          command: |
+            wget https://downloads.mongodb.com/compass/mongodb-mongosh_0.15.1_amd64.deb
+            sudo apt install mongodb-mongosh_0.15.1_amd64.deb
+      - run:
+          name: Initialize Database
+          command: |
+            - mongosh ./tests/docker/mongo-init.js
+      - run:
+          name: Build all targets
           command: cargo build
       
       - run: 

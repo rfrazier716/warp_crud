@@ -144,11 +144,8 @@ async fn test_people_update() {
     assert_eq!(updated_person.lname, "Ridcully");
 
     // There should be a gap in the timestamp
-    assert!(!updated_person.
-        timestamp.
-        signed_duration_since(*person_timestamp)
-        .is_zero()
-    );
-
-
+    assert!(!updated_person
+        .timestamp
+        .signed_duration_since(*person_timestamp)
+        .is_zero());
 }

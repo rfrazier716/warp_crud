@@ -50,7 +50,11 @@ pub mod people {
         } // if there wasn't a person with that ID return a 404 error
     }
 
-    pub async fn update<T>(client: db::Client, user_id: T, person_request: data::PersonRequest) -> Result<impl Reply, Rejection>
+    pub async fn update<T>(
+        client: db::Client,
+        user_id: T,
+        person_request: data::PersonRequest,
+    ) -> Result<impl Reply, Rejection>
     where
         T: AsRef<str>,
     {

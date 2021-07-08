@@ -28,6 +28,10 @@ pub fn people_routes(
             .clone()
             .and(update_route())
             .and_then(handler::people::update))
+        .or(people
+            .clone()
+            .and(delete_route())
+            .and_then(handler::people::delete))
 }
 
 fn create_route() -> impl Filter<Extract = (data::PersonRequest,), Error = warp::Rejection> + Copy {

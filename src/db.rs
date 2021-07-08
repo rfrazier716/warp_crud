@@ -111,6 +111,22 @@ pub async fn update_person(
     Ok(())
 }
 
+pub async fn delete_person(client: &Client, obj_id: &str) -> Result<()> {
+    // convert object id to mongodb ID
+    let obj_id = ObjectId::parse_str(obj_id)?;
+
+    let filter = doc! {ID: obj_id}; // the filter for the item to delete
+
+    client
+        .database(DB_NAME)
+        .collection::<Document>("people")
+        .delete_one(filter, None)
+        .await
+        .map_err(MongoQueryError)?;
+
+    Ok(())
+}
+
 fn doc_to_person(doc: &Document) -> Result<data::Person> {
     let id = doc.get_object_id(ID)?.to_hex(); //Fields will always need an ID
     let fname = doc.get_str(FNAME)?.to_owned();

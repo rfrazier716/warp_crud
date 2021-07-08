@@ -1,6 +1,6 @@
+use serial_test::serial;
 use std::collections::HashMap;
 use warp_crud::data::Person;
-use serial_test::serial;
 
 mod common;
 
@@ -152,4 +152,38 @@ async fn test_people_update() {
         .timestamp
         .signed_duration_since(*person_timestamp)
         .is_zero());
+}
+
+#[tokio::test]
+#[serial]
+async fn test_people_delete() {
+    // create the app and client
+    let app_address = tokio::join!(common::spawn_app()).0.unwrap();
+    let client = reqwest::Client::new();
+
+    // Create the people endpoint to get a list of people in the database
+    let base_endpoint = format!(
+        "http://{}:{}/api/people",
+        app_address.ip(),
+        app_address.port()
+    );
+
+    //Build a response
+    let resp = client.get(&base_endpoint).send().await.unwrap();
+
+    //get the current list of people so we can extract a single ID to update
+    let people = resp
+        .json::<Vec<Person>>()
+        .await
+        .map_err(|_source| String::from("Could not convert reply into list of People Structs"))
+        .unwrap();
+
+    let person_id = &people[0].id; // get the id that we are trying to delete
+    let person_endpoint = format!("{}/{}", base_endpoint, person_id);
+
+    let resp = client.delete(&person_endpoint).send().await.unwrap();
+    assert!(resp.status().is_success()); // assert that that we got a success for the delete operation
+
+    let resp = client.get(&person_endpoint).send().await.unwrap();
+    assert_eq!(resp.status().as_u16(), 404);
 }

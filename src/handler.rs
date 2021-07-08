@@ -61,4 +61,12 @@ pub mod people {
         db::update_person(&client, user_id.as_ref(), person_request).await?;
         Ok(StatusCode::OK) //return a success if the update occured
     }
+
+    pub async fn delete<T>(client: db::Client, user_id: T) -> Result<impl Reply, Rejection>
+    where
+        T: AsRef<str>,
+    {
+        db::delete_person(&client, user_id.as_ref()).await?;
+        Ok(StatusCode::OK)
+    }
 }

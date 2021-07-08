@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 use warp_crud::data::Person;
+use serial_test::serial;
 
 mod common;
 
 #[tokio::test]
+#[serial]
 async fn test_people_create() {
     //spawn the app so the server is running
     //need to block on this or the request can happen before the server starts
@@ -30,6 +32,7 @@ async fn test_people_create() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_people_read() {
     //spawn the app so the server is running
     //need to block on this or the request can happen before the server starts
@@ -86,6 +89,7 @@ async fn test_people_read() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_people_update() {
     //spawn the app so the server is running
     //need to block on this or the request can happen before the server starts

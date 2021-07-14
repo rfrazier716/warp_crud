@@ -1,5 +1,5 @@
 use warp::http::StatusCode;
-use warp::{Rejection, Reply};
+use warp::Reply;
 
 use crate::error::Error::*;
 use crate::{data, db};
@@ -41,10 +41,10 @@ pub fn recover(error: crate::error::Error) -> Result<Box<dyn Reply>, Infallible>
     }
 }
 
-pub async fn health(client: db::Client) -> Result<impl Reply, Rejection> {
+pub async fn health(client: db::Client) -> Result<Box<dyn Reply>, Infallible> {
     tracing::info!("Pinging Database");
-    db::ping(&client).await?;
-    Ok(StatusCode::OK)
+    warp_handle!(db::ping(&client).await);
+    Ok(Box::new(StatusCode::OK))
 }
 
 pub mod people {
@@ -54,14 +54,14 @@ pub mod people {
     pub async fn create(
         client: db::Client,
         person: data::PersonRequest,
-    ) -> Result<impl Reply, Rejection> {
-        let reply = db::create_person(&client, person).await?;
-        Ok(warp::reply::json(&reply))
+    ) -> Result<Box<dyn Reply>, Infallible> {
+        let reply = warp_handle!(db::create_person(&client, person).await);
+        Ok(Box::new(warp::reply::json(&reply)))
     }
 
-    pub async fn read_all(client: db::Client) -> Result<impl Reply, Rejection> {
-        let reply = db::get_people(&client).await?;
-        Ok(warp::reply::json(&reply))
+    pub async fn read_all(client: db::Client) -> Result<Box<dyn Reply>, Infallible> {
+        let reply = warp_handle!(db::get_people(&client).await);
+        Ok(Box::new(warp::reply::json(&reply)))
     }
 
     pub async fn read_single<T>(client: db::Client, user_id: T) -> Result<Box<dyn Reply>, Infallible>
@@ -72,23 +72,19 @@ pub mod people {
         Ok(Box::new(warp::reply::json(&person)))
     }
 
-    pub async fn update<T>(
+    pub async fn update(
         client: db::Client,
-        user_id: T,
+        user_id: impl AsRef<str>,
         person_request: data::PersonRequest,
-    ) -> Result<impl Reply, Rejection>
-    where
-        T: AsRef<str>,
+    ) -> Result<Box<dyn Reply>, Infallible>
     {
-        db::update_person(&client, user_id.as_ref(), person_request).await?;
-        Ok(StatusCode::OK) //return a success if the update occured
+        warp_handle!(db::update_person(&client, user_id.as_ref(), person_request).await);
+        Ok(Box::new(StatusCode::OK)) //return a success if the update occured
     }
 
-    pub async fn delete<T>(client: db::Client, user_id: T) -> Result<impl Reply, Rejection>
-    where
-        T: AsRef<str>,
+    pub async fn delete(client: db::Client, user_id: impl AsRef<str>) -> Result<Box<dyn Reply>, Infallible>
     {
-        db::delete_person(&client, user_id.as_ref()).await?;
-        Ok(StatusCode::OK)
+        warp_handle!(db::delete_person(&client, user_id.as_ref()).await);
+        Ok(Box::new(StatusCode::OK))
     }
 }

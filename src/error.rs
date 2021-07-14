@@ -22,7 +22,7 @@ pub enum Error {
     MongoCreateError,
 
     #[error("Item does not exist in collection")]
-    NonexistentResourceError
+    NonexistentResourceError,
 }
 
 impl Reject for Error {}

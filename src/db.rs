@@ -42,7 +42,7 @@ pub async fn get_people(client: &Client) -> Result<Vec<data::Person>> {
         .await
 }
 
-pub async fn get_person(client: &Client, obj_id: &str) -> Result<Option<data::Person>> {
+pub async fn get_person(client: &Client, obj_id: &str) -> Result<data::Person> {
     let obj_id = ObjectId::parse_str(obj_id)?;
 
     let result = client
@@ -56,9 +56,9 @@ pub async fn get_person(client: &Client, obj_id: &str) -> Result<Option<data::Pe
         .map_err(MongoQueryError)?;
 
     if let Some(doc) = result {
-        Ok(Some(doc_to_person(&doc)?))
+        Ok(doc_to_person(&doc)?)
     } else {
-        Ok(None)
+        Err(NonexistentResourceError)
     }
 }
 

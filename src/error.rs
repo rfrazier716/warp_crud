@@ -20,6 +20,9 @@ pub enum Error {
 
     #[error("Database insertion did not return a new ObjectID")]
     MongoCreateError,
+
+    #[error("Item does not exist in collection")]
+    NonexistentResourceError
 }
 
 impl Reject for Error {}

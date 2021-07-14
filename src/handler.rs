@@ -18,15 +18,20 @@ macro_rules! warp_handle {
 
 pub fn recover(error: crate::error::Error) -> Result<Box<dyn Reply>, Infallible> {
     match error {
-        MongoOidError(oid) => Ok(Box::new(
+        MongoOidError(oid_error) => Ok(Box::new(
             warp::http::Response::builder()
                 .status(400)
-                .body(format!("{}", oid)),
+                .body(format!("{}", oid_error)),
         )),
         MongoQueryError(mongo_error) => Ok(Box::new(
             warp::http::Response::builder()
                 .status(500)
                 .body(format!("{}", mongo_error)),
+        )),
+        NonexistentResourceError => Ok(Box::new(
+            warp::http::Response::builder()
+            .status(404)
+            .body("404: Not Found")
         )),
         _ => Ok(Box::new(
             warp::http::Response::builder()
@@ -63,15 +68,8 @@ pub mod people {
     where
         T: AsRef<str>,
     {
-        if let Some(person) = warp_handle!(db::get_person(&client, user_id.as_ref()).await) {
-            Ok(Box::new(warp::reply::json(&person)))
-        } else {
-            Ok(Box::new(
-                warp::http::Response::builder()
-                    .status(404)
-                    .body("404: Not Found"),
-            ))
-        }
+        let person= warp_handle!(db::get_person(&client, user_id.as_ref()).await);
+        Ok(Box::new(warp::reply::json(&person)))
     }
 
     pub async fn update<T>(

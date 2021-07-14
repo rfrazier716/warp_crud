@@ -79,7 +79,7 @@ async fn test_people_read() {
     // the error filter should make this a 404
     let malformed_id_endpoint = format!("{}/{}", &base_endpoint, "deadbeef");
     let resp = client.get(&malformed_id_endpoint).send().await.unwrap();
-    assert_eq!(resp.status().as_u16(), 404); // verify we get a 404 error
+    assert_eq!(resp.status().as_u16(), 400); // verify we get a 400 error
 
     // now make a couple dummy requests - this is the right id layout but nonexistant
     let nonexistent_id_endpoint = format!("{}/{}", &base_endpoint, "deadbeefdeadbeefdeadbeef");

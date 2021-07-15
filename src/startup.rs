@@ -14,7 +14,7 @@ pub async fn run(
         .map_err(|source| error::Error::DataBaseError { source })?;
 
     // Add all our routes
-    let routes = routes::routes(client).with(warp::trace::request());
+    let routes = routes::routes(client);
 
     // Create a Socket to bind the server to
     let socket = SocketAddr::new(

@@ -101,15 +101,21 @@ pub async fn update_person(
 
     let filter = doc! { ID: obj_id};
 
-    client
+    let result = client
         .database(DB_NAME)
         .collection::<Document>("people")
         .update_one(filter, doc, None)
         .await
         .map_err(MongoQueryError)?;
 
-    Ok(())
+    // if we neither matched nor updated any document return a 404 error
+    if (result.matched_count, result.modified_count) == (0,0) {
+        Err(NonexistentResourceError)
+    } else {
+        Ok(())
+    }
 }
+
 
 pub async fn delete_person(client: &Client, obj_id: &str) -> Result<()> {
     // convert object id to mongodb ID
@@ -117,14 +123,18 @@ pub async fn delete_person(client: &Client, obj_id: &str) -> Result<()> {
 
     let filter = doc! {ID: obj_id}; // the filter for the item to delete
 
-    client
+    let result = client
         .database(DB_NAME)
         .collection::<Document>("people")
         .delete_one(filter, None)
         .await
         .map_err(MongoQueryError)?;
 
-    Ok(())
+    // if nothing was deleted raise a 404 error
+    match result.deleted_count {
+        0 => Err(NonexistentResourceError),
+        _ => Ok(())
+    }
 }
 
 fn doc_to_person(doc: &Document) -> Result<data::Person> {

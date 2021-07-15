@@ -48,7 +48,6 @@ fn read_single_route() -> impl Filter<Extract = (String,), Error = warp::Rejecti
         .and(path::end())
 }
 
-#[allow(dead_code)] //TODO!: Remove this after implementing handler
 fn update_route(
 ) -> impl Filter<Extract = (String, data::PersonRequest), Error = warp::Rejection> + Copy {
     warp::put()
@@ -57,7 +56,6 @@ fn update_route(
         .and(path::end())
 }
 
-#[allow(dead_code)] //TODO!: Remove this after implementing handler
 fn delete_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Copy {
     warp::delete()
         .and(warp::path::param::<String>())

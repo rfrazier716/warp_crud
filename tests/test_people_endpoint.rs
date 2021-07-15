@@ -159,10 +159,14 @@ async fn test_people_update() {
         app_address.ip(),
         app_address.port(),
     );
-    
-    let resp = client.put(invalid_endpoint).json(&map).send().await.unwrap();
-    assert_eq!(resp.status().as_u16(), 404)
 
+    let resp = client
+        .put(invalid_endpoint)
+        .json(&map)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(resp.status().as_u16(), 404)
 }
 
 #[tokio::test]
@@ -190,12 +194,12 @@ async fn test_people_delete() {
         .unwrap();
 
     // get the id that we are trying to delete
-    let person_id = &people[0].id; 
+    let person_id = &people[0].id;
     let person_endpoint = format!("{}/{}", base_endpoint, person_id);
 
     // assert that that we got a success for the delete operation
     let resp = client.delete(&person_endpoint).send().await.unwrap();
-    assert!(resp.status().is_success()); 
+    assert!(resp.status().is_success());
 
     // assert that trying to "get" the client again results in a 404 error
     let resp = client.get(&person_endpoint).send().await.unwrap();
@@ -203,5 +207,5 @@ async fn test_people_delete() {
 
     // assert that trying to delete a nonexistent entity also results in a 404 error
     let resp = client.delete(&person_endpoint).send().await.unwrap();
-    assert_eq!(resp.status().as_u16(), 404); 
+    assert_eq!(resp.status().as_u16(), 404);
 }

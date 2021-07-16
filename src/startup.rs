@@ -2,7 +2,6 @@ use crate::{config, db, error, routes};
 use std::future::Future;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use tokio::signal;
-use warp::Filter;
 
 // Run is in its own function so it can be started as a separate task for Integration Tests
 pub async fn run(

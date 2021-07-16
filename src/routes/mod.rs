@@ -1,9 +1,7 @@
 use crate::{db, handler};
 use std::convert::Infallible;
-use warp::{Filter, trace::Trace};
-use warp::trace::Info;
-use rand;
 use tracing::field::{display, Empty};
+use warp::Filter;
 
 mod health;
 mod people;
@@ -26,7 +24,7 @@ pub fn routes(
                 remote.addr = Empty,
                 referer = Empty,
             );
-            
+
             // Record optional fields.
             if let Some(remote_addr) = info.remote_addr() {
                 span.record("remote.addr", &display(remote_addr));
@@ -39,7 +37,6 @@ pub fn routes(
             tracing::debug!(parent: &span, "received request");
 
             span
-
         }))
 }
 

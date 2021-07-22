@@ -1,4 +1,6 @@
-application_port: 3030
+server:
+  address: 127.0.0.1
+  application_port: 3030
 
 database:
   uri: mongodb://root:example@localhost:27017

@@ -1,4 +1,0 @@
-application_port: 3030
-
-log:
-  - info

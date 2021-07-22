@@ -16,25 +16,34 @@ pub struct LoggerSettings {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct ServerSettings {
+    pub application_port: u16,
+    pub address: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
     pub log: Vec<String>,
-    pub application_port: u16,
+    pub server: ServerSettings,
 }
 
 impl Settings {
     pub fn new() -> Result<Self> {
         // Figure out what config to load based on environment Variables
         // Use Development by Default
-        let env = std::env::var("RUN_ENV").unwrap_or_else(|_| String::from("development"));
+        let env = std::env::var("RUN_ENV").unwrap_or_else(|_| String::from("default"));
         let mut settings = Config::new(); // Create a new config
 
+        // Merge Default Settings
         settings
             .merge(File::with_name(DEFAULT_CONFIG_PATH))
-            .map_err(|source| Error::ConfigurationError { source })?; // Merge Default Settings
+            .map_err(|source| Error::ConfigurationError { source })?; 
+
+        //merge the specific environment settings
         settings
             .merge(File::with_name(&format!("{}{}", CONFIG_FILE_PREFIX, env)))
-            .map_err(|source| Error::ConfigurationError { source })?; //merge the specific environment settings
+            .map_err(|source| Error::ConfigurationError { source })?; 
 
         // Get database login information from the Environment
         // These Env Variables should be EA_DATABASE__URI
@@ -42,6 +51,7 @@ impl Settings {
             .merge(Environment::with_prefix("ea").separator("__"))
             .map_err(|source| Error::ConfigurationError { source })?;
 
+        // Convert it into a settings Struct and raise an error if we could not
         settings
             .try_into()
             .map_err(|source| Error::ConfigurationError { source })
@@ -54,7 +64,9 @@ mod test {
     use std::env;
 
     const TEST_CONFIG: &str = r#"
-application_port: 3030
+server:
+    application_port: 3030
+    address: 127.0.0.1
 database:
     uri: mongodb://root:example@localhost:27017
 log:
@@ -70,6 +82,10 @@ log:
         assert_eq!(
             config.database.uri,
             "mongodb://root:example@localhost:27017"
+        );
+        assert_eq!(
+            config.server.address,
+            "127.0.0.1"
         )
     }
 
@@ -85,20 +101,4 @@ log:
         let config: Settings = s.try_into().unwrap();
         assert_eq!(config.database.uri, "changed");
     }
-
-    // #[test]
-    // fn test_creating_with_missing_fields() {
-    //     // set the environment variable for the database username
-    //     env::set_var("EA_DATABASE__USERNAME", "changed");
-    //     let mut s = Config::new();
-    //     s.merge(File::from_str(
-    //         TEST_CONFIG_NO_USERNAME,
-    //         config::FileFormat::Yaml,
-    //     ))
-    //     .unwrap();
-    //     s.merge(Environment::with_prefix("ea").separator("__"))
-    //         .unwrap();
-    //     let config: Settings = s.try_into().unwrap();
-    //     assert_eq!(config.database.username, "changed");
-    // }
 }

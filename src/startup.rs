@@ -1,6 +1,7 @@
 use crate::{config, db, error, routes};
 use std::future::Future;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::str::FromStr;
 use tokio::signal;
 
 // Run is in its own function so it can be started as a separate task for Integration Tests
@@ -17,8 +18,8 @@ pub async fn run(
 
     // Create a Socket to bind the server to
     let socket = SocketAddr::new(
-        IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)),
-        settings.application_port,
+        IpAddr::V4(Ipv4Addr::from_str(&settings.server.address).expect("Could Not Parse IP Address from Configuration")),
+        settings.server.application_port,
     );
 
     //Start the Server

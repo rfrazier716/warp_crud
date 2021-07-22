@@ -10,7 +10,7 @@ pub async fn run(
     // Create a Database Connection from the URI
     let client = db::Client::with_uri_str(settings.database.uri)
         .await
-        .map_err(|source| error::Error::DataBaseError { source })?;
+        .map_err(|source| error::Error::ClientInitializationError { source })?;
 
     // Add all our routes
     let routes = routes::routes(client);

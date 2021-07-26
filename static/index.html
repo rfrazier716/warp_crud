@@ -1,50 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>People API</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <script
-      src="http://code.jquery.com/jquery-3.3.1.min.js"
-      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-      crossorigin="anonymous">
-    </script>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous">
+        </script>
 </head>
+
 <body>
     <div class="container">
         <h1 class='text-center'>People API</h1>
         <div class="controller row border border-3 border-secondary rounded mb-4">
-        <div class="text-fields col-lg-4 col-md-6 col-sm-12 ">
-            <form>
-                <label for="fname">First Name</label>
-                <input type="text" class="form-control" id="fname" placeholder="Carrot">
-                <label for="lname">Last Name</label>
-                <input type="text" class="form-control" id="lname" placeholder="Ironfounderson">
-            </form>
-            <div class="input-buttons mt-2 mb-2">
-                <button id="create" type="button" class="btn btn-primary">Create</button>
-                <button id="read" type="button" class="btn btn-primary">Read</button>
-                <button id="update" type="button" class="btn btn-primary">Update</button>
-                <button id="delete" type="button" class="btn btn-primary">Delete</button>
+            <div class="text-fields col-lg-4 col-md-6 col-sm-12 ">
+                <form>
+                    <label for="fname">First Name</label>
+                    <input type="text" class="form-control" id="fname" placeholder="Carrot">
+                    <label for="lname">Last Name</label>
+                    <input type="text" class="form-control" id="lname" placeholder="Ironfounderson">
+                </form>
+                <div class="input-buttons mt-2 mb-2">
+                    <button id="create" type="button" class="btn btn-primary">Create</button>
+                    <button id="update" type="button" class="btn btn-primary">Update</button>
+                    <button id="delete" type="button" class="btn btn-primary">Delete</button>
+                    <button id="reset" type="button" class="btn btn-danger ml-2">Reset</button>
+
+                </div>
             </div>
         </div>
-        </div>
-
-        <table class="table people-table">
-            <thead>
-            <tr>
-                <th scope="col">Select</th>
-                <th scope="col">First name</th>
-                <th scope="col">Last name</th>
-                <th scope="col">Last Updated</th>
-            </tr>
-            </thead>
-        </table>
+        <div class='people'>
+            <table class="table people-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Select</th>
+                        <th scope="col">First name</th>
+                        <th scope="col">Last name</th>
+                        <th scope="col">Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
     </div>
-    
+    </div>
+
 </body>
-<script src="/scripts/home.js"></script> 
+<script src="/scripts/home.js"></script>
+
 </html>

@@ -1,0 +1,7 @@
+.controller {
+    background-color: var(--secondary);
+}
+
+.input-buttons {
+    margin: 4em;
+}

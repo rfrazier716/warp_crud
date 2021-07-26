@@ -9,7 +9,7 @@ mod people;
 pub fn routes(
     client: db::Client,
 ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-    let base_route = warp::fs::dir("www");
+    let base_route = warp::fs::dir("static");
 
     health::health_routes(client.clone())
         .or(people::people_routes(client))

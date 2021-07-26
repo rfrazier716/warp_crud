@@ -38,12 +38,12 @@ impl Settings {
         // Merge Default Settings
         settings
             .merge(File::with_name(DEFAULT_CONFIG_PATH))
-            .map_err(|source| Error::ConfigurationError { source })?; 
+            .map_err(|source| Error::ConfigurationError { source })?;
 
         //merge the specific environment settings
         settings
             .merge(File::with_name(&format!("{}{}", CONFIG_FILE_PREFIX, env)))
-            .map_err(|source| Error::ConfigurationError { source })?; 
+            .map_err(|source| Error::ConfigurationError { source })?;
 
         // Get database login information from the Environment
         // These Env Variables should be EA_DATABASE__URI
@@ -83,10 +83,7 @@ log:
             config.database.uri,
             "mongodb://root:example@localhost:27017"
         );
-        assert_eq!(
-            config.server.address,
-            "127.0.0.1"
-        )
+        assert_eq!(config.server.address, "127.0.0.1")
     }
 
     #[test]

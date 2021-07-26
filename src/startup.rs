@@ -18,7 +18,10 @@ pub async fn run(
 
     // Create a Socket to bind the server to
     let socket = SocketAddr::new(
-        IpAddr::V4(Ipv4Addr::from_str(&settings.server.address).expect("Could Not Parse IP Address from Configuration")),
+        IpAddr::V4(
+            Ipv4Addr::from_str(&settings.server.address)
+                .expect("Could Not Parse IP Address from Configuration"),
+        ),
         settings.server.application_port,
     );
 

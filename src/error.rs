@@ -5,7 +5,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error("Error Creating Database client from URI {source}")]
-    ClientInitializationError {source: mongodb::error::Error},
+    ClientInitializationError { source: mongodb::error::Error },
 
     #[error("Error Configuring Server: {source}")]
     ConfigurationError { source: config::ConfigError },

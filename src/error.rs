@@ -10,6 +10,9 @@ pub enum Error {
     #[error("Error Configuring Server: {source}")]
     ConfigurationError { source: config::ConfigError },
 
+    #[error("Could not Parse Server Configuration from \"{0}\"")]
+    ServerConfigError(String),
+
     #[error("could not access field in document: {0}")]
     MongoDataError(#[from] bson::document::ValueAccessError),
 

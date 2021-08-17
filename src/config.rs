@@ -2,7 +2,7 @@ use crate::error::{Error, Result};
 use config::{Config, Environment, File};
 use serde::{Deserialize, Serialize};
 
-const DEFAULT_CONFIG_PATH: &str = "./config/default.yml";
+const DEFAULT_CONFIG_PATH: &str = "./config/Default.yml";
 const CONFIG_FILE_PREFIX: &str = "./config/";
 
 #[derive(Clone, Debug, Deserialize)]
@@ -16,24 +16,24 @@ pub enum Env {
 impl std::fmt::Display for Env {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Env::Default => write!(f, "default"),
-            Env::Test => write!(f, "test"),
-            Env::Development => write!(f, "development"),
-            Env::Production => write!(f, "production"),
+            Env::Default => write!(f, "Default"),
+            Env::Test => write!(f, "Test"),
+            Env::Development => write!(f, "Development"),
+            Env::Production => write!(f, "Production"),
         }
     }
 }
 
 impl std::str::FromStr for Env {
-    type Err=Error;
+    type Err = Error;
 
     fn from_str(s: &str) -> Result<Self> {
         match s {
-            "default" => Ok(Env::Default),
-            "test" => Ok(Env::Test),
-            "development" => Ok(Env::Development),
-            "production" => Ok(Env::Production),
-            _ => Err(Error::ServerConfigError(String::from(s)))
+            "Default" => Ok(Env::Default),
+            "Test" => Ok(Env::Test),
+            "Development" => Ok(Env::Development),
+            "Production" => Ok(Env::Production),
+            _ => Err(Error::ServerConfigError(String::from(s))),
         }
     }
 }
@@ -66,14 +66,16 @@ impl Settings {
     pub fn new() -> Result<Self> {
         // Figure out what config to load based on environment Variables
         // Use Development by Default
-        let env = std::env::var("RUN_ENV").unwrap_or_else(|_| String::from("default"));
+        let env = std::env::var("RUN_ENV").unwrap_or_else(|_| String::from("Default"));
         let mut settings = Config::new(); // Create a new config
 
-        // put the environment into the settings file
-        settings.set("environment", env.clone())?;
-
-        collect_configuration_files(&mut settings, Env::Default)?;
+        collect_configuration_files(&mut settings, &env)?;
         collect_environment_variables(&mut settings)?;
+
+        // put the environment into the settings file
+        settings
+            .set("environment", env)
+            .map_err(|source| Error::ConfigurationError { source })?;
 
         // Convert it into a settings Struct and raise an error if we could not
         settings
@@ -82,12 +84,7 @@ impl Settings {
     }
 }
 
-fn load_runtime_environment() -> Result<Env> {
-    if let Ok(env) => 
-
-}
-
-fn collect_configuration_files(config: &mut Config, env: Env) -> Result<&mut Config> {
+fn collect_configuration_files<'a>(config: &'a mut Config, env: &str) -> Result<&'a mut Config> {
     // Merge Default Settings
     config
         .merge(File::with_name(DEFAULT_CONFIG_PATH))
@@ -144,8 +141,7 @@ log:
         let mut s = Config::new();
         s.merge(File::from_str(TEST_CONFIG, config::FileFormat::Yaml))
             .unwrap();
-        s.merge(Env::with_prefix("ea").separator("__"))
-            .unwrap();
+        s.merge(Env::with_prefix("ea").separator("__")).unwrap();
         let config: Settings = s.try_into().unwrap();
         assert_eq!(config.database.uri, "changed");
     }

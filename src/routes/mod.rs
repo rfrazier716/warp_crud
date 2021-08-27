@@ -1,10 +1,12 @@
-use crate::{db, handler};
+use crate::{db, data, handler};
 use std::convert::Infallible;
 use tracing::field::{display, Empty};
-use warp::Filter;
+use warp::{Filter, Rejection};
+use warp::filters::cookie;
 
 mod health;
 mod people;
+mod todos;
 
 pub fn routes(
     client: db::Client,
@@ -12,6 +14,7 @@ pub fn routes(
     let base_route = warp::fs::dir("static");
 
     health::health_routes(client.clone())
+        .or(todos::todo_routes(client.clone()))
         .or(people::people_routes(client))
         .or(base_route)
         .with(warp::trace(|info| {
@@ -44,4 +47,16 @@ pub fn with_db(
     client: db::Client,
 ) -> impl Filter<Extract = (db::Client,), Error = Infallible> + Clone {
     warp::any().map(move || client.clone())
+}
+
+pub fn with_optional_session() -> impl Filter<Extract = (Option<data::Session>,), Error = Infallible> + Copy {
+    cookie::optional::<uuid::Uuid>("session").map(|cookie: Option<uuid::Uuid>| if let Some(id) = cookie {
+        Some(id.into())
+    } else {
+        None
+    })
+}
+
+pub fn with_required_session() -> impl Filter<Extract = (data::Session,), Error = warp::Rejection> + Copy {
+    cookie::cookie::<uuid::Uuid>("session").map(|cookie: uuid::Uuid| cookie.into())
 }

@@ -117,3 +117,32 @@ pub mod people {
         Ok(Box::new(StatusCode::OK))
     }
 }
+
+pub mod todos {
+    use super::*;
+
+    pub async fn get_todos(
+        client: db::Client,
+        session: Option<data::Session>,
+    ) -> Result<Box<dyn Reply>, Infallible> {
+        tracing::info!("Querying all todo items for user");
+        if let Some(session) = session {
+            // if a session exists get all todo items and return them
+            let reply = warp_handle!(db::get_todos(&client, &session).await);
+            tracing::info!("Query Successful");
+            Ok(Box::new(warp::reply::json(&reply)))
+        } else {
+            // if a session does not exist we need to make a new session
+            tracing::info!("No Session Provided, Creating new Todo List");
+
+            // create a new todo list
+            let reply = warp_handle!(db::create_todo_list(&client).await);
+            tracing::info!("Created new todo list");
+            Ok(Box::new(warp::reply::with_header(
+                warp::reply::json(&reply.todos),
+                "set-cookie",
+                format!("session={}", reply.session.id().to_simple()),
+            )))
+        }
+    }
+}

@@ -5,14 +5,13 @@ use futures::stream::{StreamExt, TryStreamExt};
 use mongodb::bson::{
     doc, oid::ObjectId, serde_helpers::serialize_uuid_as_binary, Bson, Document, Serializer,
 };
-use mongodb::options;
 use uuid::Uuid;
 
 const DB_NAME: &str = "warp_crud"; // database name
 const PEOPLE: &str = "people"; // the people collection
 
 // Create a few consts for inserting and requesting from database
-const SESSION: &str = "session";
+const SESSION: &str = "session.id";
 const ID: &str = "_id";
 const FNAME: &str = "fname";
 const LNAME: &str = "lname";
@@ -34,22 +33,42 @@ pub fn uuid_to_bson(uuid: &Uuid) -> Result<Bson> {
         .map_err(|_| SessionError(String::from("Could not Serialize Session ID as BSON")))
 }
 
-pub async fn get_todos(client: &Client, session: data::Session) -> Result<Vec<data::Todo>> {
-    let data::Session(sid) = session;
-    let filter = doc!{SESSION: uuid_to_bson(&sid)?};
-    let options = options::FindOneOptions::builder()
-    .projection(doc! { TODOS: 1})
-    .build();
+pub async fn create_todo_list(client: &Client) -> Result<data::TodoList> {
+    // Create a new dummy todo list
+    let todo_list = data::TodoList {
+        session: data::Session::new(),
+        todos: vec![data::Todo {
+            name: String::from("Delete This Todo"),
+            timestamp: Utc::now(),
+        }],
+    };
+
+    // Insert it into the Database
+    client
+        .database(DB_NAME)
+        .collection::<data::TodoList>(TODOS)
+        .insert_one(&todo_list, None)
+        .await
+        .map_err(MongoQueryError)?;
+    Ok(todo_list)
+}
+
+pub async fn get_todos(client: &Client, session: &data::Session) -> Result<Vec<data::Todo>> {
+    let filter = doc! {SESSION: uuid_to_bson(session.id())?};
+    let options = mongodb::options::FindOneOptions::builder()
+        .projection(doc! {TODOS: 1})
+        .build();
 
     let result = client
-    .database(DB_NAME)
-    .collection::<Vec<data::Todo>>("todos")
-    .find_one(Some(filter), None)
-    .await
-    .map_err(MongoQueryError)?;
+        .database(DB_NAME)
+        .collection::<data::TodoList>(TODOS)
+        // .collection::<Document>(TODOS)
+        .find_one(Some(filter), None)
+        .await
+        .map_err(MongoQueryError)?;
 
     if let Some(todo_list) = result {
-        Ok(todo_list)
+        Ok(todo_list.todos)
     } else {
         Err(NonexistentResourceError)
     }
@@ -66,12 +85,12 @@ pub async fn get_people(client: &Client) -> Result<Vec<data::Person>> {
     // The cursor returns a Stream of Result<T>, so we need to map the error and then wrap the whole
     // vec in a result
     cursor
-    .map(|reply| match reply {
-        Ok(doc) => doc_to_person(&doc),
-        Err(e) => Err(MongoQueryError(e)),
-    })
-    .try_collect()
-    .await
+        .map(|reply| match reply {
+            Ok(doc) => doc_to_person(&doc),
+            Err(e) => Err(MongoQueryError(e)),
+        })
+        .try_collect()
+        .await
 }
 
 pub async fn get_person(client: &Client, obj_id: &str) -> Result<data::Person> {

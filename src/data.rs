@@ -1,5 +1,7 @@
 use chrono::prelude::*;
+use mongodb::bson::serde_helpers;
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Person {
@@ -21,4 +23,30 @@ pub struct Todo {
     pub timestamp: DateTime<Utc>,
 }
 
-pub struct Session(uuid::Uuid);
+#[derive(Deserialize, Serialize)]
+pub struct Session {
+    #[serde(with = "serde_helpers::uuid_as_binary")]
+    id: uuid::Uuid,
+}
+
+impl Session {
+    pub fn new() -> Self {
+        Self { id: uuid::Uuid::new_v4() }
+    }
+
+    pub fn id(&self) -> &uuid::Uuid {
+        &self.id
+    }
+}
+
+impl From<uuid::Uuid> for Session {
+    fn from(id: uuid::Uuid) -> Self {
+        Self {id}
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TodoList {
+    pub session: Session,
+    pub todos: Vec<Todo>,
+}

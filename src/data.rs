@@ -20,3 +20,5 @@ pub struct Todo {
     pub name: String,
     pub timestamp: DateTime<Utc>,
 }
+
+pub struct Session(uuid::Uuid);

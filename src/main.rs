@@ -5,8 +5,10 @@ use warp_crud::{config, startup};
 async fn main() {
     // load the config
     let server_config = config::Settings::new().expect("Could not Load Server Configuration");
-    println!("Setting up server for environment: {}", server_config.environment);
-
+    println!(
+        "Setting up server for environment: {}",
+        server_config.environment
+    );
 
     // Load the Trace filter settings from the Configuration
     // We're slicing the struct apart but that should be fine since we don't need that field anymore

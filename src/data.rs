@@ -14,3 +14,9 @@ pub struct PersonRequest {
     pub fname: String,
     pub lname: String,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct Todo {
+    pub name: String,
+    pub timestamp: DateTime<Utc>,
+}

@@ -28,6 +28,6 @@ pub enum Error {
     #[error("Item does not exist in collection")]
     NonexistentResourceError,
 
-    #[error("Session Error: {0}")]
-    SessionError(String)
+    #[error("Unhandled Serialization Error: {0}")]
+    SerializationError(mongodb::bson::ser::Error)
 }

@@ -125,8 +125,8 @@ pub mod todos {
         client: db::Client,
         session: Option<data::Session>,
     ) -> Result<Box<dyn Reply>, Infallible> {
-        tracing::info!("Querying all todo items for user");
         if let Some(session) = session {
+            tracing::info!("Querying all todo items for user");
             // if a session exists get all todo items and return them
             let reply = warp_handle!(db::get_todos(&client, &session).await);
             tracing::info!("Query Successful");
@@ -144,5 +144,37 @@ pub mod todos {
                 format!("session={}", reply.session.id().to_simple()),
             )))
         }
+    }
+
+    pub async fn create_todo(
+        client: db::Client,
+        session: data::Session,
+        todo: data::Todo
+    ) -> Result<Box<dyn Reply>, Infallible> {
+
+        tracing::info!("Creating new Todo");
+        warp_handle!(db::create_todo(&client, &session, &todo).await);
+        Ok(Box::new(warp::reply()))
+    }
+
+    pub async fn delete_todo(
+        client: db::Client,
+        session: data::Session,
+        todo_id: uuid::Uuid
+    ) -> Result<Box<dyn Reply>, Infallible> {
+        tracing::info!("Deleting todo");
+        warp_handle!(db::delete_todo(&client, &session, &todo_id).await);
+        Ok(Box::new(warp::reply()))
+    }
+
+    pub async fn update_todo(
+        client: db::Client,
+        session: data::Session,
+        todo_id: uuid::Uuid,
+        update: data::TodoRequest
+    ) -> Result<Box<dyn Reply>, Infallible> {
+        tracing::info!("Updating Todo");
+        warp_handle!(db::update_todo(&client, &session, &todo_id, &update).await);
+        Ok(Box::new(warp::reply()))
     }
 }

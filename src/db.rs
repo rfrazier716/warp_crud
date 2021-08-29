@@ -1,7 +1,10 @@
+use std::str::FromStr;
+
 use crate::{data, error::Error::*, Result};
 
 use chrono::prelude::*;
 use futures::stream::{StreamExt, TryStreamExt};
+use mongodb::bson;
 use mongodb::bson::{
     doc, oid::ObjectId, serde_helpers::serialize_uuid_as_binary, Bson, Document, Serializer,
 };
@@ -29,18 +32,14 @@ pub async fn ping(client: &Client) -> Result<Document> {
 }
 
 pub fn uuid_to_bson(uuid: &Uuid) -> Result<Bson> {
-    serialize_uuid_as_binary(&uuid, Serializer::new())
-        .map_err(|_| SessionError(String::from("Could not Serialize Session ID as BSON")))
+    serialize_uuid_as_binary(&uuid, Serializer::new()).map_err(SerializationError)
 }
 
 pub async fn create_todo_list(client: &Client) -> Result<data::TodoList> {
     // Create a new dummy todo list
     let todo_list = data::TodoList {
         session: data::Session::new(),
-        todos: vec![data::Todo {
-            name: String::from("Delete This Todo"),
-            timestamp: Utc::now(),
-        }],
+        todos: vec!["Delete This Todo".into()],
     };
 
     // Insert it into the Database
@@ -55,9 +54,6 @@ pub async fn create_todo_list(client: &Client) -> Result<data::TodoList> {
 
 pub async fn get_todos(client: &Client, session: &data::Session) -> Result<Vec<data::Todo>> {
     let filter = doc! {SESSION: uuid_to_bson(session.id())?};
-    let options = mongodb::options::FindOneOptions::builder()
-        .projection(doc! {TODOS: 1})
-        .build();
 
     let result = client
         .database(DB_NAME)
@@ -72,6 +68,68 @@ pub async fn get_todos(client: &Client, session: &data::Session) -> Result<Vec<d
     } else {
         Err(NonexistentResourceError)
     }
+}
+
+pub async fn create_todo(
+    client: &Client,
+    session: &data::Session,
+    todo: &data::Todo,
+) -> Result<()> {
+    let filter = doc! {SESSION: uuid_to_bson(session.id())?};
+    let todo = bson::to_bson(todo).map_err(SerializationError)?;
+    let update = doc! { "$push": {"todos": todo}};
+
+    // Find the Document and push a todo
+    client
+        .database(DB_NAME)
+        .collection::<Document>(TODOS)
+        .find_one_and_update(filter, update, None)
+        .await
+        .map_err(MongoQueryError)?;
+
+    Ok(())
+}
+
+pub async fn delete_todo(
+    client: &Client,
+    session: &data::Session,
+    todo_id: &uuid::Uuid,
+) -> Result<()> {
+    let filter = doc! {SESSION: uuid_to_bson(session.id())?};
+    let update =
+        doc! {"$pull": {"todos": {"id": bson::to_bson(todo_id).map_err(SerializationError)?}}};
+
+    client
+        .database(DB_NAME)
+        .collection::<Document>(TODOS)
+        .find_one_and_update(filter, update, None)
+        .await
+        .map_err(MongoQueryError)?;
+
+    Ok(())
+}
+
+pub async fn update_todo(
+    client: &Client,
+    session: &data::Session,
+    todo_id: &uuid::Uuid,
+    update: &data::TodoRequest,
+) -> Result<()> {
+    let filter = doc! {
+        SESSION: uuid_to_bson(session.id())?, 
+        "todos.id": bson::to_bson(todo_id).map_err(SerializationError)?
+    };
+
+    let update = doc! { "$set": { "todos.$.name": &update.name }};
+
+    client
+        .database(DB_NAME)
+        .collection::<Document>(TODOS)
+        .find_one_and_update(filter, update, None)
+        .await
+        .map_err(MongoQueryError)?;
+
+    Ok(())
 }
 
 pub async fn get_people(client: &Client) -> Result<Vec<data::Person>> {

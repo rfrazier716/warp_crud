@@ -29,5 +29,5 @@ pub enum Error {
     NonexistentResourceError,
 
     #[error("Unhandled Serialization Error: {0}")]
-    SerializationError(mongodb::bson::ser::Error)
+    SerializationError(mongodb::bson::ser::Error),
 }

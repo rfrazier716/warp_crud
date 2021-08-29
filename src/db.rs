@@ -116,7 +116,7 @@ pub async fn update_todo(
     update: &data::TodoRequest,
 ) -> Result<()> {
     let filter = doc! {
-        SESSION: uuid_to_bson(session.id())?, 
+        SESSION: uuid_to_bson(session.id())?,
         "todos.id": bson::to_bson(todo_id).map_err(SerializationError)?
     };
 

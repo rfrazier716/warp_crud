@@ -18,7 +18,7 @@ pub struct PersonRequest {
 }
 #[derive(Serialize, Deserialize)]
 pub struct TodoRequest {
-    pub name: String
+    pub name: String,
 }
 
 #[derive(Deserialize, Serialize)]

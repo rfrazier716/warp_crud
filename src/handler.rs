@@ -149,9 +149,8 @@ pub mod todos {
     pub async fn create_todo(
         client: db::Client,
         session: data::Session,
-        todo: data::Todo
+        todo: data::Todo,
     ) -> Result<Box<dyn Reply>, Infallible> {
-
         tracing::info!("Creating new Todo");
         warp_handle!(db::create_todo(&client, &session, &todo).await);
         Ok(Box::new(warp::reply()))
@@ -160,7 +159,7 @@ pub mod todos {
     pub async fn delete_todo(
         client: db::Client,
         session: data::Session,
-        todo_id: uuid::Uuid
+        todo_id: uuid::Uuid,
     ) -> Result<Box<dyn Reply>, Infallible> {
         tracing::info!("Deleting todo");
         warp_handle!(db::delete_todo(&client, &session, &todo_id).await);
@@ -171,7 +170,7 @@ pub mod todos {
         client: db::Client,
         session: data::Session,
         todo_id: uuid::Uuid,
-        update: data::TodoRequest
+        update: data::TodoRequest,
     ) -> Result<Box<dyn Reply>, Infallible> {
         tracing::info!("Updating Todo");
         warp_handle!(db::update_todo(&client, &session, &todo_id, &update).await);

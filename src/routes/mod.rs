@@ -1,8 +1,8 @@
-use crate::{db, data, handler};
+use crate::{data, db, handler};
 use std::convert::Infallible;
 use tracing::field::{display, Empty};
-use warp::{Filter, Rejection};
 use warp::filters::cookie;
+use warp::{Filter, Rejection};
 
 mod health;
 mod people;
@@ -49,14 +49,18 @@ pub fn with_db(
     warp::any().map(move || client.clone())
 }
 
-pub fn with_optional_session() -> impl Filter<Extract = (Option<data::Session>,), Error = Infallible> + Copy {
-    cookie::optional::<uuid::Uuid>("session").map(|cookie: Option<uuid::Uuid>| if let Some(id) = cookie {
-        Some(id.into())
-    } else {
-        None
+pub fn with_optional_session(
+) -> impl Filter<Extract = (Option<data::Session>,), Error = Infallible> + Copy {
+    cookie::optional::<uuid::Uuid>("session").map(|cookie: Option<uuid::Uuid>| {
+        if let Some(id) = cookie {
+            Some(id.into())
+        } else {
+            None
+        }
     })
 }
 
-pub fn with_required_session() -> impl Filter<Extract = (data::Session,), Error = warp::Rejection> + Copy {
+pub fn with_required_session(
+) -> impl Filter<Extract = (data::Session,), Error = warp::Rejection> + Copy {
     cookie::cookie::<uuid::Uuid>("session").map(|cookie: uuid::Uuid| cookie.into())
 }

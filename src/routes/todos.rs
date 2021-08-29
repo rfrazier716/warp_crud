@@ -1,4 +1,4 @@
-use warp::filters::{body, path};
+use warp::filters::body;
 use warp::Filter;
 
 use super::{with_db, with_optional_session, with_required_session};

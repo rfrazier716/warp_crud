@@ -2,7 +2,7 @@ use crate::{data, db, handler};
 use std::convert::Infallible;
 use tracing::field::{display, Empty};
 use warp::filters::cookie;
-use warp::{Filter, Rejection};
+use warp::Filter;
 
 mod health;
 mod people;

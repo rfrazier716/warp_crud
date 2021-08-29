@@ -31,25 +31,27 @@ async fn test_getting_todos() {
     // assert that we got a "success" code back
 }
 
-async fn test_creating_todo() {
-    //spawn the app so the server is running
-    //need to block on this or the request can happen before the server starts
-    let app_address = tokio::join!(common::spawn_app()).0.unwrap();
-    let client = reqwest::Client::new();
+// TODO: Figure out how to initialize a new cookie session
+// #[tokio::test]
+// async fn test_creating_todo() {
+//     //spawn the app so the server is running
+//     //need to block on this or the request can happen before the server starts
+//     let app_address = tokio::join!(common::spawn_app()).0.unwrap();
+//     let client = reqwest::Client::new();
 
-    // Create the todos endpoint
-    let endpoint = format!(
-        "http://{}:{}/api/todos",
-        app_address.ip(),
-        app_address.port()
-    );
+//     // Create the todos endpoint
+//     let endpoint = format!(
+//         "http://{}:{}/api/todos",
+//         app_address.ip(),
+//         app_address.port()
+//     );
 
-    let new_todo = data::TodoRequest{name: "Run To The Hills!".to_owned()};
+//     let new_todo = data::TodoRequest{name: "Run To The Hills!".to_owned()};
 
-    //Build a response
-    let resp = client.post(endpoint).json::<data::TodoRequest>(&new_todo).send().await.unwrap();
+//     //Build a response
+//     let resp = client.post(endpoint).json::<data::TodoRequest>(&new_todo).send().await.unwrap();
 
-    // Verify we got a success
-    assert!(resp.status().is_success());
+//     // Verify we got a success
+//     assert!(resp.status().is_success());
 
-}
+// }

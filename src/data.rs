@@ -67,6 +67,12 @@ impl Session {
     }
 }
 
+impl Default for Session {
+    fn default() -> Self {
+        Self { id: Default::default() }
+    }
+}
+
 impl From<uuid::Uuid> for Session {
     fn from(id: uuid::Uuid) -> Self {
         Self { id }

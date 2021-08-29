@@ -51,13 +51,8 @@ pub fn with_db(
 
 pub fn with_optional_session(
 ) -> impl Filter<Extract = (Option<data::Session>,), Error = Infallible> + Copy {
-    cookie::optional::<uuid::Uuid>("session").map(|cookie: Option<uuid::Uuid>| {
-        if let Some(id) = cookie {
-            Some(id.into())
-        } else {
-            None
-        }
-    })
+    cookie::optional::<uuid::Uuid>("session")
+        .map(|cookie: Option<uuid::Uuid>| cookie.map(|id| id.into()))
 }
 
 pub fn with_required_session(

@@ -14,7 +14,7 @@ name = "warp_crud"
 [dependencies]
 # The Framework we'll be using
 warp="0.3.0"
-reqwest = "0.11.3" # used for integration tests
+reqwest = {version="0.11.3", features=["cookies"]} # used for integration tests
 tokio = {version="1.6.0", features=["full"]}
 mongodb = {version="2.0.0-beta.3", features=["bson-chrono-0_4", "bson-uuid-0_8"]}
 futures = "0.3.15"

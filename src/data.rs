@@ -69,7 +69,9 @@ impl Session {
 
 impl Default for Session {
     fn default() -> Self {
-        Self { id: Default::default() }
+        Self {
+            id: Default::default(),
+        }
     }
 }
 

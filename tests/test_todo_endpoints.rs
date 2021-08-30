@@ -28,23 +28,39 @@ async fn test_creating_todo() {
     //need to block on this or the request can happen before the server starts
     let app = common::App::launch(Some("Test")).await.unwrap();
     let endpoint = app.route("/api/todos");
-    let client = reqwest::Client::builder().cookie_store(true).build().expect("Could not Create Client");
-
-
+    let client = reqwest::Client::builder()
+        .cookie_store(true)
+        .build()
+        .expect("Could not Create Client");
 
     // Run a get reqest to the app so we get a session cookie back
-    client.get(&endpoint).send().await.expect("Error Running Get Request to App");
+    client
+        .get(&endpoint)
+        .send()
+        .await
+        .expect("Error Running Get Request to App");
 
-    let new_todo = data::TodoRequest{name: "Run To The Hills!".to_owned()};
+    let new_todo = data::TodoRequest {
+        name: "Run To The Hills!".to_owned(),
+    };
 
     // Send a post request to the
-    let resp = client.post(&endpoint).json::<data::TodoRequest>(&new_todo).send().await.unwrap();
+    let resp = client
+        .post(&endpoint)
+        .json::<data::TodoRequest>(&new_todo)
+        .send()
+        .await
+        .unwrap();
 
     // Verify we got a success
     assert!(resp.status().is_success());
 
-    // Verify that if we now run a get request we should have 2 items, 
-    let resp = client.get(&endpoint).send().await.expect("Error Running Get Request to App");
+    // Verify that if we now run a get request we should have 2 items,
+    let resp = client
+        .get(&endpoint)
+        .send()
+        .await
+        .expect("Error Running Get Request to App");
     let body = resp.json::<Vec<data::Todo>>().await.unwrap();
 
     // assure that the body has a length of 1 and that the only element says the default message
@@ -58,23 +74,39 @@ async fn test_updating_todo() {
     //need to block on this or the request can happen before the server starts
     let app = common::App::launch(Some("Test")).await.unwrap();
     let endpoint = app.route("/api/todos");
-    let client = reqwest::Client::builder().cookie_store(true).build().expect("Could not Create Client");
-
-
+    let client = reqwest::Client::builder()
+        .cookie_store(true)
+        .build()
+        .expect("Could not Create Client");
 
     // Run a get reqest to the app so we get a session cookie back
-    let resp = client.get(&endpoint).send().await.expect("Error Running Get Request to App");
+    let resp = client
+        .get(&endpoint)
+        .send()
+        .await
+        .expect("Error Running Get Request to App");
     let todo_id = resp.json::<Vec<data::Todo>>().await.unwrap()[0].id;
 
     // make a new todo request and send an update request with the todo_id endpoint
-    let new_todo = data::TodoRequest{name: "Run To The Hills!".to_owned()};
-    let resp = client.put(format!("{}/{}",endpoint, todo_id)).json::<data::TodoRequest>(&new_todo).send().await.unwrap();
+    let new_todo = data::TodoRequest {
+        name: "Run To The Hills!".to_owned(),
+    };
+    let resp = client
+        .put(format!("{}/{}", endpoint, todo_id))
+        .json::<data::TodoRequest>(&new_todo)
+        .send()
+        .await
+        .unwrap();
 
     // Verify we got a success
     assert!(resp.status().is_success());
 
     // Verify that if we now run a get request we get the updated item
-    let resp = client.get(&endpoint).send().await.expect("Error Running Get Request to App");
+    let resp = client
+        .get(&endpoint)
+        .send()
+        .await
+        .expect("Error Running Get Request to App");
     let body = resp.json::<Vec<data::Todo>>().await.unwrap();
 
     // assure that the body has a length of 1 and that the only element says the default message
@@ -88,20 +120,35 @@ async fn test_deleting_todo() {
     //need to block on this or the request can happen before the server starts
     let app = common::App::launch(Some("Test")).await.unwrap();
     let endpoint = app.route("/api/todos");
-    let client = reqwest::Client::builder().cookie_store(true).build().expect("Could not Create Client");
+    let client = reqwest::Client::builder()
+        .cookie_store(true)
+        .build()
+        .expect("Could not Create Client");
 
     // Run a get reqest to the app so we get a session cookie back
-    let resp = client.get(&endpoint).send().await.expect("Error Running Get Request to App");
+    let resp = client
+        .get(&endpoint)
+        .send()
+        .await
+        .expect("Error Running Get Request to App");
     let todo_id = resp.json::<Vec<data::Todo>>().await.unwrap()[0].id;
 
     // Send a Delete request containing the id of the todo we want to delete
-    let resp = client.delete(format!("{}/{}",endpoint, todo_id)).send().await.unwrap();
+    let resp = client
+        .delete(format!("{}/{}", endpoint, todo_id))
+        .send()
+        .await
+        .unwrap();
 
     // Verify we got a success
     assert!(resp.status().is_success());
 
     // Verify that if we now run a get request we get an empty vector
-    let resp = client.get(&endpoint).send().await.expect("Error Running Get Request to App");
+    let resp = client
+        .get(&endpoint)
+        .send()
+        .await
+        .expect("Error Running Get Request to App");
     let body = resp.json::<Vec<data::Todo>>().await.unwrap();
 
     // assure that the body has a length of 1 and that the only element says the default message

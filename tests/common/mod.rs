@@ -28,7 +28,7 @@ impl App {
         tokio::task::spawn(server);
         Ok(App { address: addr })
     }
-    
+
     pub fn route(self, endpoint: &str) -> String {
         format!(
             "http://{}:{}{}",

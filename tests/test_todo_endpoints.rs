@@ -174,11 +174,7 @@ async fn test_deleting_all() {
         .expect("Error Running Get Request to App");
 
     // Send a Delete request containing the id of the todo we want to delete
-    let resp = client
-        .delete(&endpoint)
-        .send()
-        .await
-        .unwrap();
+    let resp = client.delete(&endpoint).send().await.unwrap();
 
     // Verify we got a success
     assert!(resp.status().is_success());

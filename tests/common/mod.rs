@@ -1,13 +1,12 @@
+#[cfg(test)]
 use std::net::SocketAddr;
 use tokio;
 use warp_crud::{config, error::Result, startup};
 
-#[cfg(test)]
 pub struct App {
     address: SocketAddr,
 }
 
-#[cfg(test)]
 impl App {
     pub async fn launch(run_environment: Option<&str>) -> Result<App> {
         let env = match run_environment {
@@ -32,3 +31,4 @@ impl App {
         )
     }
 }
+

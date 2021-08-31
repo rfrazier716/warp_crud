@@ -66,11 +66,11 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This project spawned from my reading Luca Palmeiri's excellent "Zero to Production in Rust" book. While his book focuses on using Actix and Postgres, I was more interested in learning MongoDB and found myself drawn to Warp due to the Filter Traits. 
+This project spawned from my reading Luca Palmeiri's excellent book [Zero To Production in Rust](https://www.zero2prod.com/). While his book focuses on using [Actix](https://github.com/actix/actix-web) and [Postgres](https://www.postgresql.org/), I was more interested in learning [MongoDB](https://www.mongodb.com) and found myself drawn to [Warp](https://github.com/seanmonstar/warp) due to the Filter Traits. 
 
-At the same time I was also reading through a [Real Python Article](https://realpython.com/flask-connexion-rest-api/) on setting up a REST API. I decided to mimic my routes after the article's which allowed me to copy the front-end code and focus on the back-end.
+At the same time I was also reading through a [Real Python Article](https://realpython.com/flask-connexion-rest-api/) on setting up a REST API. I decided to mimic my routes after the article's, which allowed me to copy their front-end code and focus on the back-end.
 
-Fast Forward a couple months and I was ready to try my hand at deploying the webserver to Heroku or similar, but was mortified at the thought of giving random strangers on the internet write access to a database that other visitors would see! The way around this was to implement session cookies, so each user only saw their own sessions. While I was at it I also changed the People API to a general todo list, as I have no idea who would want to make lists of people sorted by date.
+Fast Forward a couple months and I was ready to try my hand at deploying the webserver to Heroku or similar, but was mortified at the thought of giving random strangers on the internet write access to a database that other visitors would see! The way around this was to implement session cookies, so each user only saw their own sessions. While I was at it I also changed the "People API" to a general todo list, as I have no idea who would want to make lists of people sorted by date.
 
 Most of the code structure comes from Luca's book and blog posts on LogRocket's Blog, I've tried to credit any relavent ones in the [Acknowledgements](#acknowledgements) section.
 

@@ -2,9 +2,7 @@ use crate::{data, error::Error::*, Result};
 
 use chrono::prelude::*;
 use mongodb::bson;
-use mongodb::bson::{
-    doc, serde_helpers::serialize_uuid_as_binary, Bson, Document, Serializer,
-};
+use mongodb::bson::{doc, serde_helpers::serialize_uuid_as_binary, Bson, Document, Serializer};
 use uuid::Uuid;
 
 const DB_NAME: &str = "warp_crud"; // database name
@@ -24,7 +22,7 @@ pub async fn ping(client: &Client) -> Result<Document> {
 }
 
 pub fn uuid_to_bson(uuid: &Uuid) -> Result<Bson> {
-    serialize_uuid_as_binary(&uuid, Serializer::new()).map_err(SerializationError)
+    serialize_uuid_as_binary(uuid, Serializer::new()).map_err(SerializationError)
 }
 
 pub async fn create_todo_list(client: &Client) -> Result<data::TodoList> {
@@ -67,16 +65,16 @@ pub async fn create_todo(
     session: &data::Session,
     todo: &data::Todo,
 ) -> Result<()> {
-    // Create a TODO and Only keep the 10 most recent ones 
+    // Create a TODO and Only keep the 10 most recent ones
     let filter = doc! {SESSION: uuid_to_bson(session.id())?};
     let todo = bson::to_bson(todo).map_err(SerializationError)?;
-    let update = doc! { 
-        "$push": {
-            "todos": {
-                "$each": vec![todo],
-                "$slice": 10,
-            }
-        }};
+    let update = doc! {
+    "$push": {
+        "todos": {
+            "$each": vec![todo],
+            "$slice": 10,
+        }
+    }};
 
     // Find the Document and push a todo
     client
@@ -131,19 +129,16 @@ pub async fn delete_todo(
     Ok(())
 }
 
-pub async fn delete_all_todos(
-    client: &Client,
-    session: &data::Session,
-) -> Result<()> {
+pub async fn delete_all_todos(client: &Client, session: &data::Session) -> Result<()> {
     let filter = doc! {SESSION: uuid_to_bson(session.id())?};
     let update = doc! { "$set": {"todos": []}};
 
     client
-    .database(DB_NAME)
-    .collection::<Document>(TODOS)
-    .find_one_and_update(filter, update, None)
-    .await
-    .map_err(MongoQueryError)?;
+        .database(DB_NAME)
+        .collection::<Document>(TODOS)
+        .find_one_and_update(filter, update, None)
+        .await
+        .map_err(MongoQueryError)?;
 
     Ok(())
 }

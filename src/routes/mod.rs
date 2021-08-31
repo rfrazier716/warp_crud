@@ -41,9 +41,7 @@ pub fn routes(
         }))
 }
 
-fn with_db(
-    client: db::Client,
-) -> impl Filter<Extract = (db::Client,), Error = Infallible> + Clone {
+fn with_db(client: db::Client) -> impl Filter<Extract = (db::Client,), Error = Infallible> + Clone {
     warp::any().map(move || client.clone())
 }
 
@@ -53,7 +51,7 @@ fn with_optional_session(
         .map(|cookie: Option<uuid::Uuid>| cookie.map(|id| id.into()))
 }
 
-fn with_required_session(
-) -> impl Filter<Extract = (data::Session,), Error = warp::Rejection> + Copy {
+fn with_required_session() -> impl Filter<Extract = (data::Session,), Error = warp::Rejection> + Copy
+{
     cookie::cookie::<uuid::Uuid>("session").map(|cookie: uuid::Uuid| cookie.into())
 }

@@ -117,4 +117,13 @@ pub mod todos {
         warp_handle!(db::update_todo(&client, &session, &todo_id, &update).await);
         Ok(Box::new(warp::reply()))
     }
+
+    pub async fn delete_all_todos(
+        client: db::Client,
+        session: data::Session,
+    ) -> Result<Box<dyn Reply>, Infallible> {
+        tracing::info!("Delete All todo Items for user");
+        warp_handle!(db::delete_all_todos(&client, &session).await);
+        Ok(Box::new(warp::reply()))
+    }
 }

@@ -74,31 +74,11 @@ pub async fn create_todo(
         "$push": {
             "todos": {
                 "$each": vec![todo],
-                "$sort": {"timestamp": 1},
                 "$slice": 10,
             }
         }};
 
     // Find the Document and push a todo
-    client
-        .database(DB_NAME)
-        .collection::<Document>(TODOS)
-        .find_one_and_update(filter, update, None)
-        .await
-        .map_err(MongoQueryError)?;
-
-    Ok(())
-}
-
-pub async fn delete_todo(
-    client: &Client,
-    session: &data::Session,
-    todo_id: &uuid::Uuid,
-) -> Result<()> {
-    let filter = doc! {SESSION: uuid_to_bson(session.id())?};
-    let update =
-        doc! {"$pull": {"todos": {"id": bson::to_bson(todo_id).map_err(SerializationError)?}}};
-
     client
         .database(DB_NAME)
         .collection::<Document>(TODOS)
@@ -128,6 +108,42 @@ pub async fn update_todo(
         .find_one_and_update(filter, update, None)
         .await
         .map_err(MongoQueryError)?;
+
+    Ok(())
+}
+
+pub async fn delete_todo(
+    client: &Client,
+    session: &data::Session,
+    todo_id: &uuid::Uuid,
+) -> Result<()> {
+    let filter = doc! {SESSION: uuid_to_bson(session.id())?};
+    let update =
+        doc! {"$pull": {"todos": {"id": bson::to_bson(todo_id).map_err(SerializationError)?}}};
+
+    client
+        .database(DB_NAME)
+        .collection::<Document>(TODOS)
+        .find_one_and_update(filter, update, None)
+        .await
+        .map_err(MongoQueryError)?;
+
+    Ok(())
+}
+
+pub async fn delete_all_todos(
+    client: &Client,
+    session: &data::Session,
+) -> Result<()> {
+    let filter = doc! {SESSION: uuid_to_bson(session.id())?};
+    let update = doc! { "$set": {"todos": []}};
+
+    client
+    .database(DB_NAME)
+    .collection::<Document>(TODOS)
+    .find_one_and_update(filter, update, None)
+    .await
+    .map_err(MongoQueryError)?;
 
     Ok(())
 }

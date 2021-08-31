@@ -34,6 +34,11 @@ pub fn todo_routes(
             .and(warp::put())
             .and(todo_request())
             .and_then(handler::todos::update_todo))
+        .or(todo
+            .clone()
+            .and(with_required_session())
+            .and(warp::delete())
+            .and_then(handler::todos::delete_all_todos))
 }
 
 fn todo_request() -> impl Filter<Extract = (data::TodoRequest,), Error = warp::Rejection> + Clone {

@@ -154,3 +154,43 @@ async fn test_deleting_todo() {
     // assure that the body has a length of 1 and that the only element says the default message
     assert_eq!(body.len(), 0);
 }
+
+#[tokio::test]
+async fn test_deleting_all() {
+    //spawn the app so the server is running
+    //need to block on this or the request can happen before the server starts
+    let app = common::App::launch(Some("Test")).await.unwrap();
+    let endpoint = app.route("/api/todos");
+    let client = reqwest::Client::builder()
+        .cookie_store(true)
+        .build()
+        .expect("Could not Create Client");
+
+    // Run a get reqest to the app so we get a session cookie back
+    client
+        .get(&endpoint)
+        .send()
+        .await
+        .expect("Error Running Get Request to App");
+
+    // Send a Delete request containing the id of the todo we want to delete
+    let resp = client
+        .delete(&endpoint)
+        .send()
+        .await
+        .unwrap();
+
+    // Verify we got a success
+    assert!(resp.status().is_success());
+
+    // Verify that if we now run a get request we get an empty vector
+    let resp = client
+        .get(&endpoint)
+        .send()
+        .await
+        .expect("Error Running Get Request to App");
+    let body = resp.json::<Vec<data::Todo>>().await.unwrap();
+
+    // assure that the body has a length of 1 and that the only element says the default message
+    assert_eq!(body.len(), 0);
+}

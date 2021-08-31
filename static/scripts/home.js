@@ -35,7 +35,7 @@ function timeDifference(current, previous) {
     }
 }
 
-class TodosModel {
+class Model {
     constructor(event_pump) {
         this.$event_pump = $('body');
     }
@@ -57,7 +57,7 @@ class TodosModel {
             })
     }
 
-    createPerson(task) {
+    createTodo(task) {
         let ajax_options = {
             type: 'POST',
             url: API_ADDRESS,
@@ -74,7 +74,7 @@ class TodosModel {
             })
     }
 
-    updatePerson(id, task) {
+    updateTodo(id, task) {
         let ajax_options = {
             type: 'PUT',
             url: API_ADDRESS + id,
@@ -91,7 +91,7 @@ class TodosModel {
             })
     }
 
-    deletePerson(id) {
+    deleteTodo(id) {
         let ajax_options = {
             type: 'DELETE',
             url: API_ADDRESS + id,
@@ -105,7 +105,7 @@ class TodosModel {
             })
     }
 
-    clearAllPeople() {
+    clearAllTodos() {
         let ajax_options = {
             type: 'DELETE',
             url: API_ADDRESS,
@@ -121,7 +121,7 @@ class TodosModel {
 
 }
 
-class TodoView {
+class View {
     constructor() { }
 
     build_table(todos) {
@@ -146,7 +146,7 @@ class TodoView {
     }
 }
 
-class PeopleController {
+class Controller {
     constructor(model, view) {
         this.$event_pump = $('body');
         this.model = model;
@@ -179,24 +179,24 @@ class PeopleController {
         //creating a new person
         $('#create').click((e) => {
             let task = $task.val();
-            this.model.createPerson(task);
+            this.model.createTodo(task);
         });
 
         // deleting a person
         $('#delete').click((e) => {
             e.preventDefault();
-            this.model.deletePerson(this.get_selected_id())
+            this.model.deleteTodo(this.get_selected_id())
         });
 
         // updating a person
         $('#update').click((e) => {
             let task = $task.val();
-            this.model.updatePerson(this.get_selected_id(), task)
+            this.model.updateTodo(this.get_selected_id(), task)
         })
 
         // Clearing the Text Fields 
         $('#reset').click((e) => {
-            this.model.clearAllPeople()
+            this.model.clearAllTodos()
         })
     }
 
@@ -213,4 +213,4 @@ class PeopleController {
     }
 }
 
-const app = new PeopleController(new TodosModel(), new TodoView());
+const app = new Controller(new Model(), new View());

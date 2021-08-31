@@ -1,7 +1,6 @@
 use crate::{data, error::Error::*, Result};
 
 use chrono::prelude::*;
-use futures::stream::{StreamExt, TryStreamExt};
 use mongodb::bson;
 use mongodb::bson::{
     doc, serde_helpers::serialize_uuid_as_binary, Bson, Document, Serializer,
@@ -68,9 +67,17 @@ pub async fn create_todo(
     session: &data::Session,
     todo: &data::Todo,
 ) -> Result<()> {
+    // Create a TODO and Only keep the 10 most recent ones 
     let filter = doc! {SESSION: uuid_to_bson(session.id())?};
     let todo = bson::to_bson(todo).map_err(SerializationError)?;
-    let update = doc! { "$push": {"todos": todo}};
+    let update = doc! { 
+        "$push": {
+            "todos": {
+                "$each": vec![todo],
+                "$sort": {"timestamp": 1},
+                "$slice": 10,
+            }
+        }};
 
     // Find the Document and push a todo
     client

@@ -5,7 +5,6 @@ use warp::filters::cookie;
 use warp::Filter;
 
 mod health;
-mod people;
 mod todos;
 
 pub fn routes(
@@ -14,8 +13,7 @@ pub fn routes(
     let base_route = warp::fs::dir("static");
 
     health::health_routes(client.clone())
-        .or(todos::todo_routes(client.clone()))
-        .or(people::people_routes(client))
+        .or(todos::todo_routes(client))
         .or(base_route)
         .with(warp::trace(|info| {
             let span = tracing::info_span!(
@@ -43,19 +41,19 @@ pub fn routes(
         }))
 }
 
-pub fn with_db(
+fn with_db(
     client: db::Client,
 ) -> impl Filter<Extract = (db::Client,), Error = Infallible> + Clone {
     warp::any().map(move || client.clone())
 }
 
-pub fn with_optional_session(
+fn with_optional_session(
 ) -> impl Filter<Extract = (Option<data::Session>,), Error = Infallible> + Copy {
     cookie::optional::<uuid::Uuid>("session")
         .map(|cookie: Option<uuid::Uuid>| cookie.map(|id| id.into()))
 }
 
-pub fn with_required_session(
+fn with_required_session(
 ) -> impl Filter<Extract = (data::Session,), Error = warp::Rejection> + Copy {
     cookie::cookie::<uuid::Uuid>("session").map(|cookie: uuid::Uuid| cookie.into())
 }

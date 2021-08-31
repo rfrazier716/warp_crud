@@ -17,21 +17,20 @@
 
 <body>
     <div class="container">
-        <a href="https://github.com/rfrazier716/warp_crud"><img src="/images/forkme.png" class="forkme" alt="Fork me on GitHub"></a>
-        <h1 class='text-center'>People API</h1>
+        <a href="https://github.com/rfrazier716/warp_crud"><img src="/images/forkme.png" class="forkme d-none d-md-block" alt="Fork me on GitHub"></a>
+        <h1 class='text-center'>Much Todo About Nothing</h1>
+        <h2 class='text-center'>Why use pen and paper when you can make a website instead!</h2>
         <div class="controller row border border-3 border-secondary rounded mb-4">
             <div class="text-fields col-lg-4 col-md-6 col-sm-12 ">
                 <form>
-                    <label for="fname">First Name</label>
-                    <input type="text" class="form-control" id="fname" placeholder="Carrot">
-                    <label for="lname">Last Name</label>
-                    <input type="text" class="form-control" id="lname" placeholder="Ironfounderson">
+                    <label for="task">Task (You can create up to ten)</label>
+                    <input type="text" class="form-control" id="task" placeholder="Clean The House">
                 </form>
                 <div class="input-buttons mt-2 mb-2">
                     <button id="create" type="button" class="btn btn-primary">Create</button>
                     <button id="update" type="button" class="btn btn-primary">Update</button>
                     <button id="delete" type="button" class="btn btn-primary">Delete</button>
-                    <button id="reset" type="button" class="btn btn-danger ml-2">Reset</button>
+                    <button id="reset" type="button" class="btn btn-danger ml-2">Clear All</button>
 
                 </div>
             </div>
@@ -41,8 +40,8 @@
                 <thead>
                     <tr>
                         <th scope="col">Select</th>
-                        <th scope="col">First name</th>
-                        <th scope="col">Last name</th>
+                        <th scope="col">Number</th>
+                        <th scope="col">Task</th>
                         <th scope="col">Last Updated</th>
                     </tr>
                 </thead>

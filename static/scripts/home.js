@@ -1,11 +1,46 @@
-const API_ADDRESS = "/api/people/";
+const API_ADDRESS = "/api/todos/";
 
-class PeopleModel {
+function timeDifference(current, previous) {
+    
+    var msPerMinute = 60 * 1000;
+    var msPerHour = msPerMinute * 60;
+    var msPerDay = msPerHour * 24;
+    var msPerMonth = msPerDay * 30;
+    var msPerYear = msPerDay * 365;
+    
+    var elapsed = current - previous;
+    
+    if (elapsed < msPerMinute) {
+         return Math.round(elapsed/1000) + ' seconds ago';   
+    }
+    
+    else if (elapsed < msPerHour) {
+         return Math.round(elapsed/msPerMinute) + ' minutes ago';   
+    }
+    
+    else if (elapsed < msPerDay ) {
+         return Math.round(elapsed/msPerHour ) + ' hours ago';   
+    }
+
+    else if (elapsed < msPerMonth) {
+         return 'approximately ' + Math.round(elapsed/msPerDay) + ' days ago';   
+    }
+    
+    else if (elapsed < msPerYear) {
+         return 'approximately ' + Math.round(elapsed/msPerMonth) + ' months ago';   
+    }
+    
+    else {
+         return 'approximately ' + Math.round(elapsed/msPerYear ) + ' years ago';   
+    }
+}
+
+class TodosModel {
     constructor(event_pump) {
         this.$event_pump = $('body');
     }
 
-    readPeople() {
+    readTodos() {
         let ajax_options = {
             type: 'GET',
             url: API_ADDRESS,
@@ -22,13 +57,13 @@ class PeopleModel {
             })
     }
 
-    createPerson(fname, lname) {
+    createPerson(task) {
         let ajax_options = {
             type: 'POST',
             url: API_ADDRESS,
             contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            data: JSON.stringify({ fname: fname, lname: lname })
+            dataType: 'text',
+            data: JSON.stringify({ name: task })
         };
         $.ajax(ajax_options)
             .done((reply) => {
@@ -39,12 +74,13 @@ class PeopleModel {
             })
     }
 
-    updatePerson(id, fname, lname) {
+    updatePerson(id, task) {
         let ajax_options = {
             type: 'PUT',
             url: API_ADDRESS + id,
             contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({ fname: fname, lname: lname })
+            data: JSON.stringify({ name: task })
+
         };
         $.ajax(ajax_options)
             .done((reply) => {
@@ -69,26 +105,39 @@ class PeopleModel {
             })
     }
 
+    clearAllPeople() {
+        let ajax_options = {
+            type: 'DELETE',
+            url: API_ADDRESS,
+        };
+        $.ajax(ajax_options)
+            .done((reply) => {
+                this.$event_pump.trigger('model_state_changed', []);
+            })
+            .fail((xhr, textStatus, errorThrown) => {
+                console.log(errorThrown);
+            })
+    }
 
 }
 
-class PeopleView {
+class TodoView {
     constructor() { }
 
-    build_table(people) {
+    build_table(todos) {
         let rows = '';
 
         // clear the table
         $('.people table > tbody').empty();
 
         //confirm there is a people array
-        if (people) {
-            for (let i = 0, l = people.length; i < l; i++) {
+        if (todos) {
+            for (let i = 0, l = todos.length; i < l; i++) {
                 rows += `<tr>
-                <td class="select"><input type="radio" id="person${i}" value=${people[i].id} name="peopleRadios"></td>
-                <td class="fname">${people[i].fname}</td>
-                <td class="lname">${people[i].lname}</td>
-                <td>${people[i].timestamp}</td></tr>`;
+                <td class="select"><input type="radio" id="person${i}" value=${todos[i].id} name="peopleRadios"></td>
+                <td class="task-num">${i+1}</td>
+                <td class="fname">${todos[i].name}</td>
+                <td>${timeDifference(Date.now(), Date.parse(todos[i].timestamp))}</td></tr>`;
             }
             $('.people table > tbody').append(rows);
             // update it so the first element is checked
@@ -110,7 +159,7 @@ class PeopleController {
         this.initialize_model_events()
 
         //get people from the model
-        this.model.readPeople();
+        this.model.readTodos();
     }
 
     // Validate input
@@ -125,21 +174,12 @@ class PeopleController {
 
     create_events() {
 
-        let $fname = $('#fname'),
-            $lname = $('#lname');
+        let $task = $('#task');
 
         //creating a new person
         $('#create').click((e) => {
-            let fname = $fname.val(),
-                lname = $lname.val();
-
-            e.preventDefault();
-
-            if (this.validate(fname, lname)) {
-                this.model.createPerson(fname, lname)
-            } else {
-                alert('Problem with first or last name input');
-            }
+            let task = $task.val();
+            this.model.createPerson(task);
         });
 
         // deleting a person
@@ -150,24 +190,13 @@ class PeopleController {
 
         // updating a person
         $('#update').click((e) => {
-            e.preventDefault();
-            let fname = $fname.val(),
-                lname = $lname.val();
-
-            e.preventDefault();
-
-            if (this.validate(fname, lname)) {
-                this.model.updatePerson(this.get_selected_id(), fname, lname)
-            } else {
-                alert('Problem with first or last name input');
-            }
+            let task = $task.val();
+            this.model.updatePerson(this.get_selected_id(), task)
         })
 
         // Clearing the Text Fields 
         $('#reset').click((e) => {
-            e.preventDefault();
-            $fname.val('');
-            $lname.val('');
+            this.model.clearAllPeople()
         })
     }
 
@@ -179,9 +208,9 @@ class PeopleController {
 
         // Handle the model events
         this.$event_pump.on('model_state_changed', (e) => {
-            this.model.readPeople(); // on a successful creation readback the table so it's updated
+            this.model.readTodos(); // on a successful creation readback the table so it's updated
         });
     }
 }
 
-const app = new PeopleController(new PeopleModel(), new PeopleView());
+const app = new PeopleController(new TodosModel(), new TodoView());

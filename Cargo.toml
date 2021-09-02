@@ -35,6 +35,3 @@ lazy_static = "1.4.0"
 chrono = {version="0.4.19", features = ["serde"]}
 serde_derive = "1.0.126"
 rand = "0.8.4"
-
-[dev-dependencies]
-serial_test = "0.5.1"

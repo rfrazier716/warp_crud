@@ -1,2 +1,5 @@
-/target/*
-/.circleci/*
+.dockerignore
+target/
+deploy/
+tests/
+Dockerfile

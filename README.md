@@ -40,7 +40,7 @@
   <p align="center">
     Basic todo list app with session support using Rust, Warp, and MongoDB.
     <br />
-    <a href="https://github.com/rfrazier716/warp_crud">View Demo</a>
+    <a href="https://warp-crud-b45vr.ondigitalocean.app/">View Demo</a>
   </p>
 </p>
 

@@ -22,6 +22,7 @@ pub struct TodoRequest {
 
 #[derive(Deserialize, Serialize)]
 pub struct Todo {
+    #[serde(with = "serde_helpers::uuid_as_binary")]
     pub id: uuid::Uuid,
     pub name: String,
     pub timestamp: DateTime<Utc>,

@@ -90,12 +90,12 @@ pub async fn create_todo(
 pub async fn update_todo(
     client: &Client,
     session: &data::Session,
-    todo_id: &uuid::Uuid,
+    todo_id: &Uuid,
     update: &data::TodoRequest,
 ) -> Result<()> {
     let filter = doc! {
         SESSION: uuid_to_bson(session.id())?,
-        "todos.id": bson::to_bson(todo_id).map_err(SerializationError)?
+        "todos.id": uuid_to_bson(todo_id)?
     };
 
     let update = doc! { "$set": { "todos.$.name": &update.name , "todos.$.timestamp": bson::to_bson(&Utc::now()).unwrap()}};
@@ -113,12 +113,11 @@ pub async fn update_todo(
 pub async fn delete_todo(
     client: &Client,
     session: &data::Session,
-    todo_id: &uuid::Uuid,
+    todo_id: &Uuid,
 ) -> Result<()> {
     let filter = doc! {SESSION: uuid_to_bson(session.id())?};
     let update =
-        doc! {"$pull": {"todos": {"id": bson::to_bson(todo_id).map_err(SerializationError)?}}};
-
+        doc! {"$pull": {"todos": {"id": uuid_to_bson(todo_id)?}}};
     client
         .database(DB_NAME)
         .collection::<Document>(TODOS)

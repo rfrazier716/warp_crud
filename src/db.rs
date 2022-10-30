@@ -90,7 +90,7 @@ pub async fn create_todo(
 pub async fn update_todo(
     client: &Client,
     session: &data::Session,
-    todo_id: &uuid::Uuid,
+    todo_id: &Uuid,
     update: &data::TodoRequest,
 ) -> Result<()> {
     let filter = doc! {
@@ -113,7 +113,7 @@ pub async fn update_todo(
 pub async fn delete_todo(
     client: &Client,
     session: &data::Session,
-    todo_id: &uuid::Uuid,
+    todo_id: &Uuid,
 ) -> Result<()> {
     let filter = doc! {SESSION: uuid_to_bson(session.id())?};
     let update =

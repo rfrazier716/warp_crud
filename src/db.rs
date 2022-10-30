@@ -113,7 +113,7 @@ pub async fn update_todo(
 pub async fn delete_todo(
     client: &Client,
     session: &data::Session,
-    todo_id: &Uuid,
+    todo_id: &uuid::Uuid,
 ) -> Result<()> {
     let filter = doc! {SESSION: uuid_to_bson(session.id())?};
     let update =

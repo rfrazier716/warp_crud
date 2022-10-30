@@ -36,9 +36,8 @@ impl From<TodoRequest> for Todo {
 
 impl From<&str> for Todo {
     fn from(todo: &str) -> Self {
-        let uuid = uuid::Uuid::new_v4();
         Self {
-            id: uuid,
+            id: uuid::Uuid::new_v4(),
             name: todo.to_owned(),
             timestamp: Utc::now(),
         }

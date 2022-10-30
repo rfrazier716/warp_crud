@@ -22,6 +22,7 @@ pub struct TodoRequest {
 
 #[derive(Deserialize, Serialize)]
 pub struct Todo {
+    #[serde(with = "serde_helpers::uuid_as_binary")]
     pub id: uuid::Uuid,
     pub name: String,
     pub timestamp: DateTime<Utc>,
@@ -35,8 +36,9 @@ impl From<TodoRequest> for Todo {
 
 impl From<&str> for Todo {
     fn from(todo: &str) -> Self {
+        let uuid = uuid::Uuid::new_v4();
         Self {
-            id: uuid::Uuid::new_v4(),
+            id: uuid,
             name: todo.to_owned(),
             timestamp: Utc::now(),
         }

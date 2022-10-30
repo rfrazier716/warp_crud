@@ -67,39 +67,15 @@ impl Settings {
         // Figure out what config to load based on environment Variables
         // Use Development by Default
         let env = std::env::var("RUN_ENV").unwrap_or_else(|_| String::from("Default"));
-        let mut settings = Config::new(); // Create a new config
-
-        collect_configuration_files(&mut settings, &env)?;
-        collect_environment_variables(&mut settings)?;
-
-        // put the environment into the settings file
-        settings
-            .set("environment", env)
-            .map_err(|source| Error::ConfigurationError { source })?;
-
-        // Convert it into a settings Struct and raise an error if we could not
-        settings
-            .try_into()
+        Config::builder()
+            .add_source(File::with_name(DEFAULT_CONFIG_PATH))
+            .add_source(File::with_name(&format!("{}{}", CONFIG_FILE_PREFIX, env)))
+            .add_source(Environment::with_prefix("ea").separator("__"))
+            .set_override("environment", env)
+            .map_err(|source| Error::ConfigurationError { source })?
+            .build()
+            .map_err(|source| Error::ConfigurationError { source })?
+            .try_deserialize()
             .map_err(|source| Error::ConfigurationError { source })
     }
-}
-
-fn collect_configuration_files<'a>(config: &'a mut Config, env: &str) -> Result<&'a mut Config> {
-    // Merge Default Settings
-    config
-        .merge(File::with_name(DEFAULT_CONFIG_PATH))
-        .map_err(|source| Error::ConfigurationError { source })?;
-
-    //Merge the specific environment settings
-    config
-        .merge(File::with_name(&format!("{}{}", CONFIG_FILE_PREFIX, env)))
-        .map_err(|source| Error::ConfigurationError { source })
-}
-
-fn collect_environment_variables(config: &mut Config) -> Result<&mut Config> {
-    // Get database login information from the Environment
-    // These Env Variables should be EA_DATABASE__URI
-    config
-        .merge(Environment::with_prefix("ea").separator("__"))
-        .map_err(|source| Error::ConfigurationError { source })
 }

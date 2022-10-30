@@ -13,25 +13,25 @@ name = "warp_crud"
 
 [dependencies]
 # The Framework we'll be using
-warp="0.3.0"
-reqwest = {version="0.11.3", features=["cookies", "json"]} # used for integration tests
-tokio = {version="1.6.0", features=["full"]}
-mongodb = {version="2.0.0-beta.3", features=["bson-chrono-0_4", "bson-uuid-0_8"]}
-futures = "0.3.15"
+warp="0.3.3"
+reqwest = {version="0.11.12", features=["cookies", "json"]} # used for integration tests
+tokio = {version="1.21.2", features=["full"]}
+mongodb = {version="2.3.1", features=["bson-chrono-0_4", "bson-uuid-0_8"]}
+futures = "0.3.25"
 
 # Session IDs
 uuid = { version = "0.8", features = ["serde", "v4"] }
 
 # Tracing
-tracing = "0.1.26"
-tracing-subscriber = "0.2.18"
+tracing = "0.1.37"
+tracing-subscriber = {version = "0.3.16", features = ["env-filter"]}
 
 # Other
-thiserror = "1.0.25"
-confy = "0.4.0"
-serde = "1.0.126"
-config = "0.10"
+thiserror = "1.0.37"
+confy = "0.5.1"
+serde = "1.0.147"
+config = "0.13.2"
 lazy_static = "1.4.0"
-chrono = {version="0.4.19", features = ["serde"]}
-serde_derive = "1.0.126"
-rand = "0.8.4"
+chrono = {version="0.4.22", features = ["serde"]}
+serde_derive = "1.0.147"
+rand = "0.8.5"
